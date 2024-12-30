@@ -107,7 +107,7 @@ class TencentApi(TranslateApi):
             + hashed_canonical_request
         )
         secret_date = self._sign(
-            ('TC3' + config.tencent_secret_key).encode('utf-8'),
+            ('TC3' + config.tencent_key).encode('utf-8'),
             date,
         )
         secret_service = self._sign(secret_date, service)
@@ -121,7 +121,7 @@ class TencentApi(TranslateApi):
             algorithm
             + ' '
             + 'Credential='
-            + config.tencent_secret_id
+            + config.tencent_id
             + '/'
             + credential_scope
             + ', '

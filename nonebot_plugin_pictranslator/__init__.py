@@ -41,8 +41,8 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-dictionary_handler = on_regex(r'^(?:词典|查词) (.+)')
-text_translate_handler = on_regex(r'^(?:翻译|(.+)译(.+)) (.+)')
+dictionary_handler = on_regex(r'^(?:词典|查词)(.+)')
+text_translate_handler = on_regex(r'^(?:翻译|(.+)译([^\s]+)) (.+)')
 image_translate_handler = on_regex(r'^图片(?:翻译|(.+)译(.+))')
 ocr_handler = on_startswith('ocr')
 
@@ -57,7 +57,6 @@ async def dictionary(match_group: tuple[Any, ...] = RegexGroup()):
 @text_translate_handler.handle()
 async def text_translate(match_group: tuple[Any, ...] = RegexGroup()):
     text = match_group[2].strip()  # 受限于单条消息长度一般不会超过api限制
-
     source_language, target_language = get_languages(
         match_group[0],
         match_group[1],

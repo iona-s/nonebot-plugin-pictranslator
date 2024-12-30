@@ -89,9 +89,9 @@ WIP
 |:------------------:|:------:|:---:|:------:|:------------------------------------------------------:|
 |    TIANAPI_KEY     |   是    |  无  | String |                  天聚数行APIkey，用于中英词典查询                   |
 |      腾讯API相关       |   /    |  /  |   /    | 详见[文档](https://cloud.tencent.com/document/product/551) |
-| TENCENT_SECRET_ID  | 若使用则必填 |  无  | String |                    腾讯API的secret_id                     |
-| TENCENT_SECRET_KEY | 若使用则必填 |  无  | String |                    腾讯API的secret_key                    |
-| ENABLE_TENCENT_API |   否    |  /  |  Bool  |                 是否启用腾讯API，填写了上两项则默认启用                  |
+|     TENCENT_ID     | 若使用则必填 |  无  | String |                    腾讯API的secret_id                     |
+|    TENCENT_KEY     | 若使用则必填 |  无  | String |                    腾讯API的secret_key                    |
+|   ENABLE_TENCENT   |   否    |  /  |  Bool  |                 是否启用腾讯API，填写了上两项则默认启用                  |
 | TENCENT_PROJECT_ID |   否    |  0  |  Int   |                    腾讯API的project_id                    |
 | TENCENT_API_REGION |   否    |  无  | String |                    腾讯API的secret_key                    |
 |      有道API相关       |  WIP   |

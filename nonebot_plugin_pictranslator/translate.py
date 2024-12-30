@@ -3,7 +3,8 @@ from typing import Union, Optional
 from httpx import AsyncClient
 
 from .apis.tianapi import TianApi
-from .apis.tencent_api import TencentApi
+from .apis.youdao import YoudaoApi
+from .apis.tencent import TencentApi
 
 __all__ = [
     'handle_dictionary',
@@ -30,7 +31,7 @@ async def handle_text_translate(
     target_language: str,
 ) -> str:
     async with AsyncClient() as client:
-        api = TencentApi(client)  # TODO implement choose api
+        api = YoudaoApi(client)  # TODO implement choose api
         if source_language == 'auto':
             source_language = await api.language_detection(text)
             if source_language is None:

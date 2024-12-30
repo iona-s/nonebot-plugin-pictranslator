@@ -2,7 +2,7 @@ from typing import Optional
 
 from ..config import config
 from .base_api import BaseApi
-from .response_models import DictionaryResponse
+from .response_models.tianapi import DictionaryResponse
 
 
 class TianApi(BaseApi):

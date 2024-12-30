@@ -5,7 +5,7 @@ from nonebot import logger
 from pydantic import ValidationError
 from httpx import Response, AsyncClient
 
-from .response_models import BaseResponseModel
+from .response_models.base_response_model import BaseResponseModel
 
 __all__ = ['BaseApi', 'R', 'TranslateApi']
 R = TypeVar('R', bound=BaseResponseModel)
