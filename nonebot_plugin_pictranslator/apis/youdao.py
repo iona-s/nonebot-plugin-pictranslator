@@ -102,6 +102,8 @@ class YoudaoApi(TranslateApi):
             url='https://openapi.youdao.com/ocrtransapi',
             method='POST',
             response_model=ImageTranslationResponse,
+            log_kwargs_to_trace=True,
+            log_response_to_trace=True,
             data=payload,
         )
 

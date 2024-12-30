@@ -224,6 +224,7 @@ class TencentApi(TranslateApi):
                 url='https://tmt.tencentcloudapi.com',
                 method='POST',
                 response_model=ImageTranslationResponse,
+                log_kwargs_to_trace=True,
                 json=payload,
                 headers=headers,
             )

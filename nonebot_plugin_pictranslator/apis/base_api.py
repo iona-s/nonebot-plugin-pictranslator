@@ -19,10 +19,17 @@ class BaseApi:
         self,
         url: str,
         method: str,
+        log_kwargs_to_trace: bool = False,
         **kwargs,
     ) -> Optional[Response]:
         try:
-            logger.debug(f'Requesting [{method}] {url} with {kwargs}')
+            debug_msg = f'Requesting [{method}] {url}'
+            if log_kwargs_to_trace:
+                logger.debug(debug_msg)
+                logger.trace(f'with {kwargs}')
+            else:
+                debug_msg += f' with {kwargs}'
+                logger.debug(debug_msg)
             return await self.client.request(method, url, **kwargs)
         except Exception as e:
             logger.error(f'Request [{method}] {url} failed: {e}')
@@ -33,12 +40,24 @@ class BaseApi:
         url: str,
         method: str,
         response_model: type[R],
+        *,
+        log_kwargs_to_trace: bool = False,
+        log_response_to_trace: bool = False,
         **kwargs,
     ) -> Optional[R]:
-        response = await self._request(url, method, **kwargs)
+        response = await self._request(
+            url,
+            method,
+            log_kwargs_to_trace,
+            **kwargs,
+        )
         if response is None:
             return None
-        logger.debug(f'Response: {response.text}')
+        if log_response_to_trace:
+            logger.debug(f'Response status code: {response.status_code}')
+            logger.trace(f'Response: {response.text}')
+        else:
+            logger.debug(f'Response [{response.status_code}] {response.text}')
         try:
             return response_model.from_obj(response.json())
         except ValidationError as e:
