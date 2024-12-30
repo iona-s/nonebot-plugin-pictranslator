@@ -76,7 +76,7 @@ class TencentApi(TranslateApi):
         else:
             dumped_payload = dumps(payload)
         hashed_request_payload = sha256(
-            dumped_payload.encode('utf-8'),  # noqa
+            dumped_payload.encode('utf-8'),
         ).hexdigest()
         canonical_request = (
             http_request_method
@@ -93,7 +93,7 @@ class TencentApi(TranslateApi):
         )
         credential_scope = date + '/' + service + '/' + 'tc3_request'
         hashed_canonical_request = sha256(
-            canonical_request.encode('utf-8'),  # noqa
+            canonical_request.encode('utf-8'),
         ).hexdigest()
         string_to_sign = (
             algorithm
@@ -112,7 +112,7 @@ class TencentApi(TranslateApi):
         secret_signing = self._sign(secret_service, 'tc3_request')
         signature = hmac_new(
             secret_signing,
-            string_to_sign.encode('utf-8'),  # noqa
+            string_to_sign.encode('utf-8'),
             sha256,
         ).hexdigest()
         authorization = (
@@ -249,9 +249,9 @@ class TencentApi(TranslateApi):
         source_language_name = LANGUAGE_NAME_INDEX[result.source]
         target_language_name = LANGUAGE_NAME_INDEX[result.target]
         msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}\n']
-        seg_translation_msg = ['分段翻译:\n']
+        seg_translation_msg = ['分块翻译:\n']
         whole_source_text = ''
-        img = Image.open(BytesIO(b64decode(base64_image)))  # noqa
+        img = Image.open(BytesIO(b64decode(base64_image)))
         for image_record in result.image_records:
             seg_translation_msg.append(
                 f'{image_record.source_text}\n'

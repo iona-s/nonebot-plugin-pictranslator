@@ -8,21 +8,18 @@ from nonebot import Bot, require, on_regex, on_startswith
 require('nonebot_plugin_alconna')
 require('nonebot_plugin_waiter')
 from nonebot_plugin_waiter import waiter
-from nonebot.params import Event, Matcher, Message, RegexGroup
+from nonebot.params import Event, Matcher, RegexGroup
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna.uniseg import (
     Text,
-    Image,
-    Reply,
     UniMsg,
     Reference,
-    CustomNode,
     UniMessage,
     image_fetch,
 )
 
-from .utils import get_languages
 from .config import Config, config
+from .utils import add_node, get_languages, extract_images
 from .translate import (
     handle_ocr,
     handle_dictionary,
@@ -78,50 +75,6 @@ async def text_translate(match_group: tuple[Any, ...] = RegexGroup()):
         )
 
 
-async def extract_images(msg: UniMsg) -> list[Image]:
-    if Reply in msg and isinstance((raw_reply := msg[Reply, 0].msg), Message):
-        msg = await UniMessage.generate(message=raw_reply)
-    return msg[Image]
-
-
-def add_node(
-    nodes: list[CustomNode],
-    content: Union[str, bytes],
-    bot_id: str,
-) -> list[CustomNode]:
-    if isinstance(content, str):
-        if len(content) > 3000:  # qq消息长度限制，虽然大概率也不会超过
-            for i in range(0, len(content), 2999):
-                if i + 2999 > len(content):
-                    message_segment = content[i:]
-                else:
-                    message_segment = content[i : i + 2999]
-                nodes.append(
-                    CustomNode(
-                        uid=bot_id,
-                        name='翻译姬',
-                        content=message_segment,
-                    ),
-                )
-        else:
-            nodes.append(
-                CustomNode(
-                    uid=bot_id,
-                    name='翻译姬',
-                    content=content,
-                ),
-            )
-    elif isinstance(content, bytes):
-        nodes.append(
-            CustomNode(
-                uid=bot_id,
-                name='翻译姬',
-                content=UniMessage.image(raw=content),
-            ),
-        )
-    return nodes
-
-
 @image_translate_handler.handle()
 async def image_translate(
     bot: Bot,
@@ -160,7 +113,7 @@ async def image_translate(
         # TODO 图片大小检测？
         base64_images.append(
             b64encode(
-                await image_fetch(event, bot, matcher.state, image),  # noqa
+                await image_fetch(event, bot, matcher.state, image),
             ),
         )
     msg = '翻译中...'
@@ -219,7 +172,7 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher):
             continue
         ocr_images.append(
             b64encode(
-                await image_fetch(event, bot, matcher.state, image),  # noqa
+                await image_fetch(event, bot, matcher.state, image),
             ),
         )
     await ocr_handler.send('识别中...')

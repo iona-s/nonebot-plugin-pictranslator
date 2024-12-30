@@ -49,10 +49,10 @@ async def handle_text_translate(
     target_language: str,
 ) -> list[str]:
     results = []
+    apis = await choose_api()
+    if not apis:
+        return ['无可用翻译API']
     async with AsyncClient() as client:
-        apis = await choose_api()
-        if not apis:
-            return ['无可用翻译API']
         if target_language == 'auto':
             if source_language == 'auto':
                 if apis == [YoudaoApi]:
@@ -60,15 +60,13 @@ async def handle_text_translate(
                         '有道不提供语言检测API，故默认翻译为中文。'
                         '可使用[译<语言>]来指定',
                     )
-                    target_language = 'zh'
                 else:
                     if TencentApi in apis:
                         api = TencentApi(client)
                         source_language = await api.language_detection(text)
                         if source_language is None:
                             results.append('查询出错')
-            else:
-                target_language = 'en' if source_language == 'zh' else 'zh'
+            target_language = 'en' if source_language == 'zh' else 'zh'
         for api_class in apis:
             api: TA = api_class(client)
             results.append(
@@ -87,10 +85,10 @@ async def handle_image_translate(
     target_language: str,
 ) -> list[tuple[list[str], Optional[bytes]]]:
     results = []
+    apis = await choose_api()
+    if not apis:
+        return [(['无可用翻译API'], None)]
     async with AsyncClient() as client:
-        apis = await choose_api()
-        if not apis:
-            return [(['无可用翻译API'], None)]
         for api_class in apis:
             api: TA = api_class(client)
             extra_msg = None

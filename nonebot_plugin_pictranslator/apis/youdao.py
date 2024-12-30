@@ -44,7 +44,7 @@ class YoudaoApi(TranslateApi):
         )
         return payload
 
-    async def language_detection(self, text: str) -> Optional[str]:
+    async def language_detection(self, text: str) -> Optional[str]:  # noqa
         error_msg = '有道翻译API不支持语言检测'
         raise NotImplementedError(error_msg)
 
@@ -125,12 +125,15 @@ class YoudaoApi(TranslateApi):
             return ['有道翻译出错'], None
         source_language = LANGUAGE_NAME_INDEX[result.source]
         target_language = LANGUAGE_NAME_INDEX[result.target]
-        msgs = [f'有道翻译:\n{source_language} -> {target_language}']
+        msgs = [
+            f'有道翻译:\n{source_language} -> {target_language}',
+            '分块翻译:',
+        ]
         for section in result.regions:
             msgs.extend(
                 [
-                    f'原文:\n{section.source_text}',
-                    f'翻译:\n{section.target_text}',
+                    f'{section.source_text}',
+                    f'->{section.target_text}',
                 ],
             )
         return msgs, b64decode(result.render_image)

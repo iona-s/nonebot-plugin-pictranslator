@@ -46,3 +46,4 @@ for language in LANGUAGE_NAME_INDEX:
 for language, surnames in LANGUAGE_SURNAMES.items():
     for surname in surnames:
         LANGUAGE_INDEX[surname] = language
+LANGUAGE_INDEX['翻'] = 'auto'
