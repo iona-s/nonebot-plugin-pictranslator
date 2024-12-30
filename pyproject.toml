@@ -1,13 +1,29 @@
 [project]
 name = "nonebot-plugin-pictranslator"
 version = "0.1.0"
-description = "一个nonebot多api翻译姬"
+authors = [
+    { name = "iona-s" },
+]
+description = "一个支持图片翻译的nonebot2插件"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9, <4.0"
 dependencies = [
-    "nonebot-plugin-alconna>=0.54.1",
-    "nonebot2[httpx]>=2.4.1",
-    "pillow>=11.0.0",
+    "nonebot-plugin-alconna>=0.54.0",
+    "nonebot2[httpx]>=2.4.0",
+    "pillow>=10.0.0",
+]
+
+[project.urls]
+homepage = "https://github.com/iona-s/nonebot-plugin-pictranslator"
+repository = "https://github.com/iona-s/nonebot-plugin-pictranslator"
+
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "pre-commit>=4.0.1",
+    "ruff>=0.8.4",
 ]
 
 [[tool.uv.index]]
@@ -64,11 +80,3 @@ ignore = ["E402", "D100", "D415"]
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
 multiline-quotes = "single"
-
-[dependency-groups]
-dev = [
-    "black>=24.10.0",
-    "isort>=5.13.2",
-    "pre-commit>=4.0.1",
-    "ruff>=0.8.4",
-]

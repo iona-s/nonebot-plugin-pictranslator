@@ -31,9 +31,10 @@ from .translate import (
 )
 
 __plugin_meta__ = PluginMetadata(
-    name='翻译插件',
-    description='翻译插件',
+    name='nonebot-plugin-pictranslator',
+    description='一个支持图片翻译的nonebot2插件',
     usage='翻译 [要翻译的内容]',
+    type='application',
     homepage='https://github.com/iona-s/nonebot-plugin-pictranslator',
     config=Config,
     supported_adapters=inherit_supported_adapters('nonebot_plugin_alconna'),
@@ -85,7 +86,7 @@ def add_node(
     bot_id: str,
 ) -> list[CustomNode]:
     if isinstance(content, str):
-        if len(content) > 3000:  # qq消息长度限制
+        if len(content) > 3000:  # qq消息长度限制，虽然大概率也不会超过
             for i in range(0, len(content), 2999):
                 if i + 2999 > len(content):
                     message_segment = content[i:]
@@ -138,7 +139,10 @@ async def image_translate(
         async def wait_msg(_msg: UniMsg) -> UniMsg:
             return _msg
 
-        waited_msg = await wait_msg.wait('请在60秒内发送要翻译的图片')
+        waited_msg = await wait_msg.wait(
+            '请在60秒内发送要翻译的图片',
+            timeout=60,
+        )
         if not waited_msg:
             await image_translate_handler.finish('操作超时')
         images = await extract_images(waited_msg)
@@ -187,7 +191,10 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher):
         async def wait_msg(_msg: UniMsg) -> UniMsg:
             return _msg
 
-        waited_msg = await wait_msg.wait('请在60秒内发送要识别的图片')
+        waited_msg = await wait_msg.wait(
+            '请在60秒内发送要识别的图片',
+            timeout=60,
+        )
         if not waited_msg:
             await ocr_handler.finish('操作超时')
         images = await extract_images(waited_msg)
@@ -195,9 +202,7 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher):
         await ocr_handler.finish('未检测到图片')
     ocr_images: list[Union[str, bytes]] = []
     for image in images:
-        if (
-            'multimedia.nt.qq.com.cn' in image.url
-        ):  # TODO 暂时只有qq的图片直接用url
+        if 'multimedia.nt.qq.com.cn' in image.url:  # 暂时只有qq的图片直接用url
             ocr_images.append(image.url)
             continue
         if image.path:

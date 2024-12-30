@@ -437,9 +437,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "nonebot-plugin-alconna", specifier = ">=0.54.1" },
-    { name = "nonebot2", extras = ["httpx"], specifier = ">=2.4.1" },
-    { name = "pillow", specifier = ">=11.0.0" },
+    { name = "nonebot-plugin-alconna", specifier = ">=0.54.0" },
+    { name = "nonebot2", extras = ["httpx"], specifier = ">=2.4.0" },
+    { name = "pillow", specifier = ">=10.0.0" },
 ]
 
 [package.metadata.requires-dev]
