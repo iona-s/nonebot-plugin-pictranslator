@@ -1,11 +1,11 @@
 [project]
 name = "nonebot-plugin-pictranslator"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     { name = "iona-s" },
 ]
 description = "一个支持图片翻译的nonebot2插件"
-license = "MIT"
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.9, <4.0"
 dependencies = [
