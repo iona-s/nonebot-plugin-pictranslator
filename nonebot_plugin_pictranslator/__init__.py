@@ -49,6 +49,10 @@ ocr_handler = on_startswith('ocr')
 
 @dictionary_handler.handle()
 async def dictionary(match_group: tuple[Any, ...] = RegexGroup()):
+    if config.tianapi_key is None:
+        await dictionary_handler.finish(
+            '未配置天行数据API的key，无法使用词典功能',
+        )
     word = match_group[0].strip()
     result = await handle_dictionary(word)
     await dictionary_handler.finish(await UniMessage(Text(result)).export())
@@ -63,14 +67,15 @@ async def text_translate(match_group: tuple[Any, ...] = RegexGroup()):
     )
     if target_language is None:
         await text_translate_handler.finish(source_language)
-    result = await handle_text_translate(
+    results = await handle_text_translate(
         text,
         source_language,
         target_language,
     )
-    await text_translate_handler.finish(
-        await UniMessage(Text(result)).export(),
-    )
+    for result in results:
+        await text_translate_handler.send(
+            await UniMessage(Text(result)).export(),
+        )
 
 
 async def extract_images(msg: UniMsg) -> list[Image]:
@@ -164,20 +169,21 @@ async def image_translate(
         target_language = 'zh'
     await image_translate_handler.send(msg)
     for base64_image in base64_images:
-        msgs, image = await handle_image_translate(
+        results = await handle_image_translate(
             base64_image,
             source_language,
             target_language,
         )
-        nodes = []
-        for msg in msgs:
-            add_node(nodes, msg, bot.self_id)
-        if image is not None:
-            add_node(nodes, image, bot.self_id)
-        await image_translate_handler.send(
-            await UniMessage(Reference(nodes=nodes)).export(),
-        )
-        await sleep(0.1)
+        for msgs, image in results:
+            nodes = []
+            for msg in msgs:
+                add_node(nodes, msg, bot.self_id)
+            if image is not None:
+                add_node(nodes, image, bot.self_id)
+            await image_translate_handler.send(
+                await UniMessage(Reference(nodes=nodes)).export(),
+            )
+            await sleep(0.1)
 
 
 @ocr_handler.handle()
@@ -203,7 +209,9 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher):
         await ocr_handler.finish('未检测到图片')
     ocr_images: list[Union[str, bytes]] = []
     for image in images:
-        if 'multimedia.nt.qq.com.cn' in image.url:  # 暂时只有qq的图片直接用url
+        if (
+            'multimedia.nt.qq.com.cn' in image.url
+        ):  # 暂时只有ntqq的图片直接用url
             ocr_images.append(image.url)
             continue
         if image.path:

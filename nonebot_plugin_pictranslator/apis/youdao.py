@@ -79,10 +79,13 @@ class YoudaoApi(TranslateApi):
             target_language,
         )
         if result is None:
-            return '翻译出错'
+            return '有道翻译出错'
         source_language = LANGUAGE_NAME_INDEX[result.source]
         target_language = LANGUAGE_NAME_INDEX[result.target]
-        return f'{source_language} -> {target_language}\n{result.target_text}'
+        return (
+            f'有道翻译:\n{source_language} -> {target_language}\n'
+            f'{result.target_text}'
+        )
 
     async def _image_translate(
         self,
@@ -119,10 +122,10 @@ class YoudaoApi(TranslateApi):
             target_language,
         )
         if result is None:
-            return ['翻译出错'], None
+            return ['有道翻译出错'], None
         source_language = LANGUAGE_NAME_INDEX[result.source]
         target_language = LANGUAGE_NAME_INDEX[result.target]
-        msgs = [f'{source_language} -> {target_language}']
+        msgs = [f'有道翻译:\n{source_language} -> {target_language}']
         for section in result.regions:
             msgs.extend(
                 [

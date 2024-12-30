@@ -7,13 +7,15 @@ from httpx import Response, AsyncClient
 
 from .response_models.base_response_model import BaseResponseModel
 
-__all__ = ['BaseApi', 'R', 'TranslateApi']
+__all__ = ['BaseApi', 'TranslateApi', 'R', 'TA']
 R = TypeVar('R', bound=BaseResponseModel)
+TA = TypeVar('TA', bound='TranslateApi')
 
 
 class BaseApi:
     def __init__(self, client: AsyncClient) -> None:
         self.client: AsyncClient = client
+        self.client.headers.clear()
 
     async def _request(
         self,

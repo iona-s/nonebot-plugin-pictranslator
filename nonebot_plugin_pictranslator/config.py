@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from nonebot import get_plugin_config
 from pydantic import Field, BaseModel
@@ -10,6 +10,13 @@ class Config(BaseModel):
     tianapi_key: Optional[str] = Field(
         default=None,
         description='天行数据API的key，用于中英词典查询',
+    )
+    # TODO add baidu
+    translate_api_choice: Literal['tencent', 'youdao', 'random', 'all'] = (
+        Field(
+            default='all',
+            description='选择翻译所使用的API',
+        )
     )
 
     tencent_id: Optional[str] = Field(
@@ -47,16 +54,15 @@ class Config(BaseModel):
     )
 
     def initialize(self) -> None:
-        if self.use_tencent is None:
-            if self.tencent_id and self.tencent_project_id:
-                self.use_tencent = True
-            else:
-                self.use_tencent = False
-        if self.use_youdao is None:
-            if self.youdao_id and self.youdao_key:
-                self.use_youdao = True
-            else:
-                self.use_youdao = False
+        for name in ['tencent', 'youdao']:  # TODO add baidu
+            if getattr(self, f'use_{name}') is None:
+                if getattr(self, f'{name}_id') and getattr(
+                    self,
+                    f'{name}_key',
+                ):
+                    setattr(self, f'use_{name}', True)
+                else:
+                    setattr(self, f'use_{name}', False)
 
 
 config = get_plugin_config(Config)

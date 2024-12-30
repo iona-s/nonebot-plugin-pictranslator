@@ -13,7 +13,7 @@ def get_languages(
         source_language = LANGUAGE_INDEX.get(source, None)
         target_language = LANGUAGE_INDEX.get(target, None)
         if not source_language or not target_language:
-            return '语种输入有误或不支持', None
+            return '语言输入有误或不支持', None
     else:
         source_language = 'auto'
         target_language = 'auto'

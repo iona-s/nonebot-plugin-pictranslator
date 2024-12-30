@@ -199,10 +199,13 @@ class TencentApi(TranslateApi):
             target_language,
         )
         if result is None:
-            return '翻译出错'
+            return '腾讯翻译出错'
         source_language = LANGUAGE_NAME_INDEX[result.source]
         target_language = LANGUAGE_NAME_INDEX[result.target]
-        return f'{source_language}->{target_language}:\n{result.target_text}'
+        return (
+            f'腾讯翻译:\n{source_language}->{target_language}:\n'
+            f'{result.target_text}'
+        )
 
     async def _image_translate(
         self,
@@ -242,10 +245,10 @@ class TencentApi(TranslateApi):
             target_language,
         )
         if result is None:
-            return ['翻译出错'], None
+            return ['腾讯翻译出错'], None
         source_language_name = LANGUAGE_NAME_INDEX[result.source]
         target_language_name = LANGUAGE_NAME_INDEX[result.target]
-        msgs = [f'{source_language_name}->{target_language_name}\n']
+        msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}\n']
         seg_translation_msg = ['分段翻译:\n']
         whole_source_text = ''
         img = Image.open(BytesIO(b64decode(base64_image)))  # noqa
