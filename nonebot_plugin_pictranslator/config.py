@@ -20,7 +20,7 @@ class Config(BaseModel):
         default=None,
         description='腾讯API的secret_key',
     )
-    enable_tencent: Optional[bool] = Field(
+    use_tencent: Optional[bool] = Field(
         default=None,
         description='是否启用腾讯API，填写了上两项则默认启用',
     )
@@ -41,35 +41,22 @@ class Config(BaseModel):
         default=None,
         description='有道翻译API的应用秘钥',
     )
-    enable_youdao: Optional[bool] = Field(
+    use_youdao: Optional[bool] = Field(
         default=None,
         description='是否启用腾讯API，填写了上两项则默认启用',
     )
 
-    # youdao_app_id: Optional[str] = Field(
-    #     default=None,
-    #     description='有道翻译API的app_id',
-    # )
-    # youdao_secret_key: Optional[str] = Field(
-    #     default=None,
-    #     description='有道翻译API的secret_key',
-    # )
-    # youdao_use_llm: Optional[bool] = Field(
-    #     default=False,
-    #     description='是否使用有道翻译的大模型翻译功能',
-    # )
-
     def initialize(self) -> None:
-        if self.enable_tencent is None:
+        if self.use_tencent is None:
             if self.tencent_id and self.tencent_project_id:
-                self.enable_tencent = True
+                self.use_tencent = True
             else:
-                self.enable_tencent = False
-        if self.enable_youdao is None:
+                self.use_tencent = False
+        if self.use_youdao is None:
             if self.youdao_id and self.youdao_key:
-                self.enable_youdao = True
+                self.use_youdao = True
             else:
-                self.enable_youdao = False
+                self.use_youdao = False
 
 
 config = get_plugin_config(Config)

@@ -91,10 +91,13 @@ WIP
 |      腾讯API相关       |   /    |  /  |   /    | 详见[文档](https://cloud.tencent.com/document/product/551) |
 |     TENCENT_ID     | 若使用则必填 |  无  | String |                    腾讯API的secret_id                     |
 |    TENCENT_KEY     | 若使用则必填 |  无  | String |                    腾讯API的secret_key                    |
-|   ENABLE_TENCENT   |   否    |  /  |  Bool  |                 是否启用腾讯API，填写了上两项则默认启用                  |
+|    USE_TENCENT     |   否    |  /  |  Bool  |                 是否启用腾讯API，填写了上两项则默认启用                  |
 | TENCENT_PROJECT_ID |   否    |  0  |  Int   |                    腾讯API的project_id                    |
 | TENCENT_API_REGION |   否    |  无  | String |                    腾讯API的secret_key                    |
-|      有道API相关       |  WIP   |
+|      有道API相关       |   /    |  /  |   /    |       详见[文档](https://fanyi.youdao.com/openapi/)        |
+|     YOUDAO_ID      | 若使用则必填 |  无  | String |                    有道API的secret_id                     |
+|     YOUDAO_KEY     | 若使用则必填 |  无  | String |                    有道API的secret_key                    |
+|     USE_YOUDAO     |   否    |  /  |  Bool  |                 是否启用有道API，填写了上两项则默认启用                  |
 |      百度API相关       |  WIP   |
 
 ## 🎉 使用

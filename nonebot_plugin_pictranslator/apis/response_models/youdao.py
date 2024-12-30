@@ -30,3 +30,43 @@ class TextTranslationResponse(BaseResponseModel):
     @property
     def target_text(self) -> str:
         return self.translation[0]
+
+
+class RegionContent(BaseResponseModel):
+    source_text: str = Field(..., alias='context', description='原文')
+    target_text: str = Field(..., alias='tranContent', description='翻译')
+    # 还有很多用不上的用于渲染图片的参数
+
+
+class ImageTranslationResponse(BaseResponseModel):
+    error_code: str = Field(..., alias='errorCode', description='错误码')
+    oriencation: str = Field(..., alias='orientation', description='图片方向')
+    image_size: list[int] = Field(
+        ...,
+        alias='image_size',
+        description='图片大小',
+    )
+    source_lang: str = Field(..., alias='lanFrom', description='源语言')
+    target_lang: str = Field(..., alias='lanTo', description='目标语言')
+    render_image: str = Field(
+        ...,
+        alias='render_image',
+        description='渲染后的图片base64',
+    )
+    regions: list[RegionContent] = Field(
+        ...,
+        alias='resRegions',
+        description='分区域识别详细结果',
+    )
+
+    @property
+    def source(self) -> str:
+        if self.source_lang == 'zh-CHS':
+            return 'zh'
+        return self.source_lang
+
+    @property
+    def target(self) -> str:
+        if self.target_lang == 'zh-CHS':
+            return 'zh'
+        return self.target_lang

@@ -21,8 +21,8 @@ from nonebot_plugin_alconna.uniseg import (
     image_fetch,
 )
 
-from .config import Config
 from .utils import get_languages
+from .config import Config, config
 from .translate import (
     handle_ocr,
     handle_dictionary,
@@ -182,6 +182,8 @@ async def image_translate(
 
 @ocr_handler.handle()
 async def ocr(bot: Bot, event: Event, matcher: Matcher):
+    if not config.use_tencent:
+        await ocr_handler.finish('未启用腾讯API，无法使用OCR功能')
     msg = await UniMessage.generate(event=event)
     images = await extract_images(msg)
     if not images:

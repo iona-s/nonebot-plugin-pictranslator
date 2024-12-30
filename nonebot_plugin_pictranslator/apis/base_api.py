@@ -57,7 +57,7 @@ class TranslateApi(BaseApi, ABC):
         text: str,
         source_language: str,
         target_language: str,
-    ) -> Optional[str]:
+    ) -> str:
         pass
 
     @abstractmethod
@@ -66,5 +66,5 @@ class TranslateApi(BaseApi, ABC):
         base64_image: bytes,
         source_language: str,
         target_language: str,
-    ) -> Optional[str]:
+    ) -> tuple[list[str], Optional[bytes]]:
         pass

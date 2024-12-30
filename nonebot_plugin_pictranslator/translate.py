@@ -38,14 +38,11 @@ async def handle_text_translate(
                 return '查询出错'
         if target_language == 'auto':
             target_language = 'en' if source_language == 'zh' else 'zh'
-        result = await api.text_translate(
+        return await api.text_translate(
             text,
             source_language,
             target_language,
         )
-        if result is None:
-            return '查询出错'
-        return result
 
 
 async def handle_image_translate(
@@ -54,17 +51,14 @@ async def handle_image_translate(
     target_language: str,
 ) -> tuple[list[str], Optional[bytes]]:
     async with AsyncClient() as client:
-        api = TencentApi(client)  # TODO implement choose api
+        api = YoudaoApi(client)  # TODO implement choose api
         if target_language == 'auto':
             target_language = 'en' if source_language == 'zh' else 'zh'
-        msgs, image = await api.image_translate(
+        return await api.image_translate(
             base64_image,
             source_language,
             target_language,
         )
-        if image is None:
-            return ['翻译出错'], None
-        return msgs, image
 
 
 async def handle_ocr(
@@ -72,7 +66,4 @@ async def handle_ocr(
 ) -> list[str]:
     async with AsyncClient() as client:
         api = TencentApi(client)
-        msgs = await api.ocr(image)
-        if msgs is None:
-            return ['识别出错']
-        return msgs
+        return await api.ocr(image)

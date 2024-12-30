@@ -9,8 +9,6 @@ from hmac import new as hmac_new
 from datetime import datetime, timezone
 from typing import Union, Literal, Optional
 
-from nonebot import logger
-from pydantic import ValidationError
 from PIL import Image, ImageDraw, ImageFont
 from httpx import __version__ as httpx_version
 
@@ -161,13 +159,10 @@ class TencentApi(TranslateApi):
         ).response
 
     async def language_detection(self, text: str) -> Optional[str]:
-        try:
-            return (await self._language_detection(text)).lang
-        except ValidationError as e:
-            logger.error(e)
-        except Exception as e:
-            logger.exception(e)
-        return None
+        result = await self._language_detection(text)
+        if result is None:
+            return None
+        return result.lang
 
     async def _text_translate(
         self,
@@ -197,23 +192,17 @@ class TencentApi(TranslateApi):
         text: str,
         source_language: str,
         target_language: str,
-    ) -> Optional[str]:
-        try:
-            result = await self._text_translate(
-                text,
-                source_language,
-                target_language,
-            )
-            source_language = LANGUAGE_NAME_INDEX[result.source]
-            target_language = LANGUAGE_NAME_INDEX[result.target]
-            return (
-                f'{source_language}->{target_language}:\n{result.target_text}'
-            )
-        except ValidationError as e:
-            logger.error(e)
-        except Exception as e:
-            logger.exception(e)
-        return None
+    ) -> str:
+        result = await self._text_translate(
+            text,
+            source_language,
+            target_language,
+        )
+        if result is None:
+            return '翻译出错'
+        source_language = LANGUAGE_NAME_INDEX[result.source]
+        target_language = LANGUAGE_NAME_INDEX[result.target]
+        return f'{source_language}->{target_language}:\n{result.target_text}'
 
     async def _image_translate(
         self,
@@ -245,84 +234,83 @@ class TencentApi(TranslateApi):
         base64_image: bytes,
         source_language: str,
         target_language: str,
-    ) -> tuple[Optional[list[str]], Optional[bytes]]:
-        try:
-            result = await self._image_translate(
-                base64_image,
-                source_language,
-                target_language,
+    ) -> tuple[list[str], Optional[bytes]]:
+        result = await self._image_translate(
+            base64_image,
+            source_language,
+            target_language,
+        )
+        if result is None:
+            return ['翻译出错'], None
+        source_language_name = LANGUAGE_NAME_INDEX[result.source]
+        target_language_name = LANGUAGE_NAME_INDEX[result.target]
+        msgs = [f'{source_language_name}->{target_language_name}\n']
+        seg_translation_msg = ['分段翻译:\n']
+        whole_source_text = ''
+        img = Image.open(BytesIO(b64decode(base64_image)))  # noqa
+        for image_record in result.image_records:
+            seg_translation_msg.append(
+                f'{image_record.source_text}\n'
+                f'->{image_record.target_text}\n',
             )
-            source_language_name = LANGUAGE_NAME_INDEX[result.source]
-            target_language_name = LANGUAGE_NAME_INDEX[result.target]
-            msgs = [f'{source_language_name}->{target_language_name}\n']
-            seg_translation_msg = ['分段翻译:\n']
-            whole_source_text = ''
-            img = Image.open(BytesIO(b64decode(base64_image)))  # noqa
-            for image_record in result.image_records:
-                seg_translation_msg.append(
-                    f'{image_record.source_text}\n'
-                    f'->{image_record.target_text}\n',
+            whole_source_text += image_record.source_text
+            cropped_img = img.crop(
+                (
+                    image_record.x,
+                    image_record.y,
+                    image_record.x + image_record.width,
+                    image_record.y + image_record.height,
+                ),
+            )
+            average_color = cropped_img.resize((1, 1)).getpixel((0, 0))
+            bg = Image.new(
+                'RGB',
+                (image_record.width, image_record.height),
+                average_color,
+            )
+            bg_draw = ImageDraw.Draw(bg)
+            _font = 'msyh.ttc' if target_language == 'zh' else 'arial.ttf'
+            _, _, text_width, text_height = bg_draw.textbbox(
+                (0, 0),
+                image_record.target_text,
+                font=ImageFont.truetype(_font, 100),
+            )
+            horizontal_ratio = image_record.width / text_width
+            vertical_ratio = image_record.height / text_height
+            line_number = floor(vertical_ratio / horizontal_ratio)
+            line_number = line_number if line_number > 0 else 1
+            actual_font_size = (
+                min(
+                    floor(100 * horizontal_ratio * line_number),
+                    floor(100 * vertical_ratio / line_number),
                 )
-                whole_source_text += image_record.source_text
-                cropped_img = img.crop(
-                    (
-                        image_record.x,
-                        image_record.y,
-                        image_record.x + image_record.width,
-                        image_record.y + image_record.height,
-                    ),
-                )
-                average_color = cropped_img.resize((1, 1)).getpixel((0, 0))
-                bg = Image.new(
-                    'RGB',
-                    (image_record.width, image_record.height),
-                    average_color,
-                )
-                bg_draw = ImageDraw.Draw(bg)
-                _font = 'msyh.ttc' if target_language == 'zh' else 'arial.ttf'
-                _, _, text_width, text_height = bg_draw.textbbox(
-                    (0, 0),
-                    image_record.target_text,
-                    font=ImageFont.truetype(_font, 100),
-                )
-                horizontal_ratio = image_record.width / text_width
-                vertical_ratio = image_record.height / text_height
-                line_number = floor(vertical_ratio / horizontal_ratio)
-                line_number = line_number if line_number > 0 else 1
-                actual_font_size = (
-                    min(
-                        floor(100 * horizontal_ratio * line_number),
-                        floor(100 * vertical_ratio / line_number),
-                    )
-                    - 1
-                )
-                font = ImageFont.truetype(_font, actual_font_size)
-                bg_draw.multiline_text(
-                    (0, 0),
-                    image_record.target_text,
-                    font=font,
-                    fill=tuple(255 - i for i in average_color),
-                )
-                img.paste(bg, (image_record.x, image_record.y))
-            img_output = BytesIO()
-            img.save(img_output, format='PNG')
-            msgs.extend(seg_translation_msg)
-            msgs.extend(['整段翻译:', f'原文:\n{whole_source_text}'])
-            if len(whole_source_text) < 6000:
-                result = await self._text_translate(
-                    whole_source_text,
-                    result.source,
-                    result.target,
-                )
-                msgs.append(f'->{result.target_text}')
+                - 1
+            )
+            font = ImageFont.truetype(_font, actual_font_size)
+            bg_draw.multiline_text(
+                (0, 0),
+                image_record.target_text,
+                font=font,
+                fill=tuple(255 - i for i in average_color),
+            )
+            img.paste(bg, (image_record.x, image_record.y))
+        img_output = BytesIO()
+        img.save(img_output, format='PNG')
+        msgs.extend(seg_translation_msg)
+        msgs.extend(['整段翻译:', f'原文:\n{whole_source_text}'])
+        if len(whole_source_text) < 6000:
+            result = await self._text_translate(
+                whole_source_text,
+                result.source,
+                result.target,
+            )
+            if result is None:
+                msgs.append('整段翻译失败')
             else:
-                msgs.append('文本过长，不提供整段翻译')
-            return msgs, img_output.getvalue()
-        except ValidationError as e:
-            logger.error(e)
-        except Exception as e:
-            logger.exception(e)
-        return None, None
+                msgs.append(f'->{result.target_text}')
+        else:
+            msgs.append('文本过长，不提供整段翻译')
+        return msgs, img_output.getvalue()
 
     async def _ocr(self, image: Union[str, bytes]) -> Optional[OcrContent]:
         if isinstance(image, str):
@@ -349,20 +337,16 @@ class TencentApi(TranslateApi):
             )
         ).response
 
-    async def ocr(self, image: Union[str, bytes]) -> Optional[list[str]]:
-        try:
-            result = await self._ocr(image)
-            msgs = [f'语言: {LANGUAGE_NAME_INDEX[result.language]}']
-            seg_msgs = ['分段:']
-            whole_text = ''
-            for text in result.text_detections:
-                seg_msgs.append(text.text)
-                whole_text += text.text
-            msgs.extend(seg_msgs)
-            msgs.extend(['整段:', whole_text])
-            return msgs
-        except ValidationError as e:
-            logger.error(e)
-        except Exception as e:
-            logger.exception(e)
-        return None
+    async def ocr(self, image: Union[str, bytes]) -> list[str]:
+        result = await self._ocr(image)
+        if result is None:
+            return ['OCR失败']
+        msgs = [f'语言: {LANGUAGE_NAME_INDEX[result.language]}']
+        seg_msgs = ['分段:']
+        whole_text = ''
+        for text in result.text_detections:
+            seg_msgs.append(text.text)
+            whole_text += text.text
+        msgs.extend(seg_msgs)
+        msgs.extend(['整段:', whole_text])
+        return msgs
