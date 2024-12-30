@@ -91,20 +91,11 @@ async def handle_image_translate(
     async with AsyncClient() as client:
         for api_class in apis:
             api: TA = api_class(client)
-            extra_msg = None
-            if target_language == 'auto':
-                target_language = 'en' if source_language == 'zh' else 'zh'
-                extra_msg = (
-                    '图片翻译无法自动选择目标语言，默认翻译为中文。'
-                    '可使用[图片译<语言>]来指定'
-                )
             msgs, image = await api.image_translate(
                 base64_image,
                 source_language,
                 target_language,
             )
-            if extra_msg:
-                msgs.insert(0, extra_msg)
             results.append((msgs, image))
     return results
 

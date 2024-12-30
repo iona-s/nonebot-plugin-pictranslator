@@ -39,8 +39,7 @@ __plugin_meta__ = PluginMetadata(
 
 
 dictionary_handler = on_regex(r'^(?:词典|查词)(.+)')
-text_translate_handler = on_regex(r'^(?:翻译|(.+)译([^\s]+)) (.+)')
-image_translate_handler = on_regex(r'^图片(?:翻译|(.+)译(.+))')
+translate_handler = on_regex(r'^(图片)?(?:翻译|(.+)译([^\s]+)) ?(.*)')
 ocr_handler = on_startswith('ocr')
 
 
@@ -55,72 +54,72 @@ async def dictionary(match_group: tuple[Any, ...] = RegexGroup()):
     await dictionary_handler.finish(await UniMessage(Text(result)).export())
 
 
-@text_translate_handler.handle()
-async def text_translate(match_group: tuple[Any, ...] = RegexGroup()):
-    text = match_group[2].strip()  # 受限于单条消息长度一般不会超过api限制
-    source_language, target_language = get_languages(
-        match_group[0],
-        match_group[1],
-    )
-    if target_language is None:
-        await text_translate_handler.finish(source_language)
-    results = await handle_text_translate(
-        text,
-        source_language,
-        target_language,
-    )
-    for result in results:
-        await text_translate_handler.send(
-            await UniMessage(Text(result)).export(),
-        )
-
-
-@image_translate_handler.handle()
-async def image_translate(
+@translate_handler.handle()
+async def translate(
     bot: Bot,
     event: Event,
     matcher: Matcher,
     match_group: tuple[Any, ...] = RegexGroup(),
 ):
     source_language, target_language = get_languages(
-        match_group[0],
         match_group[1],
+        match_group[2],
     )
     if target_language is None:
-        await image_translate_handler.finish(source_language)
+        await translate_handler.finish(source_language)  # 实际上是错误信息
+    image_search = bool(match_group[0])
+    translate_content = match_group[3].strip()
     msg = await UniMessage.generate(event=event)
     images = await extract_images(msg)
-    if not images:
+    if not translate_content or (image_search and not images):
 
         @waiter(waits=['message'], keep_session=True)
         async def wait_msg(_msg: UniMsg) -> UniMsg:
             return _msg
 
-        waited_msg = await wait_msg.wait(
-            '请在60秒内发送要翻译的图片',
-            timeout=60,
+        waited_msg: UniMessage = await wait_msg.wait(
+            '请在30秒内发送要翻译的内容',
+            timeout=30,
         )
         if not waited_msg:
-            await image_translate_handler.finish('操作超时')
+            await translate_handler.finish('操作超时')
         images = await extract_images(waited_msg)
+        if not images:
+            if image_search:
+                await translate_handler.finish('未检测到图片')
+            text = waited_msg.extract_plain_text()
+    elif not images:
+        text = translate_content  # 受限于单条消息长度一般不会超过api限制
+    # 最后只剩下发了图但指令没指定翻译图，则默认翻译图
     if not images:
-        await image_translate_handler.finish('未检测到图片')
+        results = await handle_text_translate(
+            text,  # noqa
+            source_language,
+            target_language,
+        )
+        for result in results:
+            await translate_handler.send(
+                await UniMessage(Text(result)).export(),
+            )
+        return
     base64_images = []
     for image in images:
         if image.path:
             base64_images.append(Path(image.path).read_bytes())
             continue
-        # TODO 图片大小检测？
+        # TODO 增加图片大小检测？
         base64_images.append(
             b64encode(
                 await image_fetch(event, bot, matcher.state, image),
             ),
         )
-    msg = '翻译中...'
     if target_language == 'auto':
-        msg = '未指定目标语言，默认为中文\n' + msg
-        target_language = 'zh'
-    await image_translate_handler.send(msg)
+        target_language = 'en' if source_language == 'zh' else 'zh'
+        await translate_handler.send(
+            '图片翻译无法自动选择目标语言，默认翻译为中文。'
+            '可使用[图片翻译<语言>]来指定',
+        )
+    await translate_handler.send('翻译中...')
     for base64_image in base64_images:
         results = await handle_image_translate(
             base64_image,
@@ -129,14 +128,13 @@ async def image_translate(
         )
         for msgs, image in results:
             nodes = []
-            for msg in msgs:
-                add_node(nodes, msg, bot.self_id)
             if image is not None:
                 add_node(nodes, image, bot.self_id)
-            await image_translate_handler.send(
+            for msg in msgs:
+                add_node(nodes, msg, bot.self_id)
+            await translate_handler.send(
                 await UniMessage(Reference(nodes=nodes)).export(),
             )
-            await sleep(0.1)
 
 
 @ocr_handler.handle()
