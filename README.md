@@ -31,9 +31,9 @@ WIP
 - [x] [天聚数行](https://www.tianapi.com/apiview/49)
 
 ### 图文翻译
--[x] [腾讯](https://ai.qq.com/)
--[ ] [有道](https://ai.youdao.com/)  WIP
--[ ] [百度](https://fanyi-api.baidu.com/)  WIP
+- [x] [腾讯](https://ai.qq.com/)
+- [ ] [有道](https://ai.youdao.com/)  WIP
+- [ ] [百度](https://fanyi-api.baidu.com/)  WIP
 
 ## 💿 安装
 
@@ -85,15 +85,15 @@ WIP
 
 在 nonebot2 项目的`.env`文件中添加下表中的必填配置
 
-|        配置项         |   必填   | 默认值 |                           说明                           |
-|:------------------:|:------:|:---:|:------------------------------------------------------:|
-|    TIANAPI_KEY     |   是    |  无  |                  天聚数行APIkey，用于中英词典查询                   |
-|      腾讯API相关       |   /    |  /  | 详见[文档](https://cloud.tencent.com/document/product/551) |
-| TENCENT_SECRET_ID  | 若使用则必填 |  无  |                    腾讯API的secret_id                     |
-| TENCENT_SECRET_KEY | 若使用则必填 |  无  |                    腾讯API的secret_key                    |
-| ENABLE_TENCENT_API |   否    |  /  |                 是否启用腾讯API，填写了上两项则默认启用                  |
-| TENCENT_PROJECT_ID |   否    |  0  |                    腾讯API的project_id                    |
-| TENCENT_API_REGION |   否    |  无  |                    腾讯API的secret_key                    |
+|        配置项         |   必填   | 默认值 |  值类型   |                           说明                           |
+|:------------------:|:------:|:---:|:------:|:------------------------------------------------------:|
+|    TIANAPI_KEY     |   是    |  无  | String |                  天聚数行APIkey，用于中英词典查询                   |
+|      腾讯API相关       |   /    |  /  |   /    | 详见[文档](https://cloud.tencent.com/document/product/551) |
+| TENCENT_SECRET_ID  | 若使用则必填 |  无  | String |                    腾讯API的secret_id                     |
+| TENCENT_SECRET_KEY | 若使用则必填 |  无  | String |                    腾讯API的secret_key                    |
+| ENABLE_TENCENT_API |   否    |  /  |  Bool  |                 是否启用腾讯API，填写了上两项则默认启用                  |
+| TENCENT_PROJECT_ID |   否    |  0  |  Int   |                    腾讯API的project_id                    |
+| TENCENT_API_REGION |   否    |  无  | String |                    腾讯API的secret_key                    |
 |      有道API相关       |  WIP   |
 |      百度API相关       |  WIP   |
 
