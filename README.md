@@ -85,21 +85,27 @@ _✨ NoneBot 插件简单描述 ✨_
 
 在 nonebot2 项目的`.env`文件中添加下表中的必填配置
 
-|         配置项          |   必填   | 默认值 |                 可填值                 |                            说明                            |
-|:--------------------:|:------:|:---:|:-----------------------------------:|:--------------------------------------------------------:|
-| TRANSLATE_API_CHOICE |   是    | all | tencent, youdao, baidu, random, all |      使用哪一个api进行翻译，`random`则随机选取，`all`则同时使用所有启用的api       |
-|       腾讯API相关        |   /    |  /  |                  /                  | 详见[腾讯文档](https://cloud.tencent.com/document/product/551) |
-|      TENCENT_ID      | 若使用则必填 |  无  |               String                |                     腾讯API的secret_id                      |
-|     TENCENT_KEY      | 若使用则必填 |  无  |               String                |                     腾讯API的secret_key                     |
-|     USE_TENCENT      |   否    |  /  |                Bool                 |                  是否启用腾讯API，填写了上两项则默认启用                   |
-|  TENCENT_PROJECT_ID  |   否    |  0  |                 Int                 |                     腾讯API的project_id                     |
-|  TENCENT_API_REGION  |   否    |  无  |               String                |                     腾讯API的secret_key                     |
-|       有道API相关        |   /    |  /  |                  /                  |       详见[有道文档](https://fanyi.youdao.com/openapi/)        |
-|      YOUDAO_ID       | 若使用则必填 |  无  |               String                |                     有道API的secret_id                      |
-|      YOUDAO_KEY      | 若使用则必填 |  无  |               String                |                     有道API的secret_key                     |
-|      USE_YOUDAO      |   否    |  /  |                Bool                 |                  是否启用有道API，填写了上两项则默认启用                   |
-|       百度API相关        |  WIP   |
-|     TIANAPI_KEY      |   是    |  无  |               String                |                   天聚数行APIkey，用于中英词典查询                    |
+|         配置项          |   必填   |           默认值            |             可填值              |                            说明                            |
+|:--------------------:|:------:|:------------------------:|:----------------------------:|:--------------------------------------------------------:|
+| TEXT_TRANSLATE_APIS  |   是    | [tencent, baidu, youdao] | List[tencent, baidu, youdao] |                   以什么优先级调用哪些api进行文本翻译                    |
+| IMAGE_TRANSLATE_APIS |   是    | [baidu, youdao, tencent] | List[tencent, youdao, baidu] |                   以什么优先级调用哪些api进行图片翻译                    |
+| TEXT_TRANSLATE_MODE  |   否    |          'auto'          |        'auto', 'all'         |      文本翻译模式，`auto`代表以优先级调用第一个可用api，`all`代表调用全部可用api      |
+| IMAGE_TRANSLATE_MODE |   否    |          'auto'          |        'auto', 'all'         |                        图片翻译模式，同上                         |
+|       腾讯API相关        |   /    |            /             |              /               | 详见[腾讯文档](https://cloud.tencent.com/document/product/551) |
+|      TENCENT_ID      | 若使用则必填 |            无             |            String            |                     腾讯API的secret_id                      |
+|     TENCENT_KEY      | 若使用则必填 |            无             |            String            |                     腾讯API的secret_key                     |
+|     USE_TENCENT      |   否    |            /             |             Bool             |                  是否启用腾讯API，填写了上两项则默认启用                   |
+|  TENCENT_PROJECT_ID  |   否    |            0             |             Int              |                     腾讯API的project_id                     |
+|  TENCENT_API_REGION  |   否    |            无             |            String            |                     腾讯API的secret_key                     |
+|       有道API相关        |   /    |            /             |              /               |       详见[有道文档](https://fanyi.youdao.com/openapi/)        |
+|      YOUDAO_ID       | 若使用则必填 |            无             |            String            |                    有道翻译API的secret_id                     |
+|      YOUDAO_KEY      | 若使用则必填 |            无             |            String            |                    有道翻译API的secret_key                    |
+|      USE_YOUDAO      |   否    |            /             |             Bool             |                 是否启用有道翻译API，填写了上两项则默认启用                  |
+|       百度API相关        |   /    |            /             |              /               |       详见[百度文档](https://fanyi-api.baidu.com/doc/11)       |
+|       BAIDU_ID       | 若使用则必填 |            无             |            String            |                    百度翻译API的secret_id                     |
+|      BAIDU_KEY       | 若使用则必填 |            无             |            String            |                    百度翻译API的secret_key                    |
+|      USE_BAIDU       |   否    |            /             |             Bool             |                 是否启用百度翻译API，填写了上两项则默认启用                  |
+|     TIANAPI_KEY      |   是    |            无             |            String            |                   天聚数行APIkey，用于中英词典查询                    |
 
 ## 🎉 使用
 ### 指令表

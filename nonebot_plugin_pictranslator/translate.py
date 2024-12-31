@@ -1,4 +1,3 @@
-from random import choice
 from typing import Union, Optional
 
 from httpx import AsyncClient
@@ -31,29 +30,19 @@ async def handle_dictionary(word: str) -> str:
         return ret.result.word + ':\n' + ret.result.content.replace('|', '\n')
 
 
-async def choose_api() -> (
-    list[type[TA]]
-):  # TODO 更复杂的选择逻辑，如区分文本和图片
-    if config.translate_api_choice == 'all':
-        api_choices = []
-        for name, api in AVAILABLE_TRANSLATION_APIS.items():
-            if getattr(config, f'use_{name}'):
-                api_choices.append(api)
-        return api_choices
-    if config.translate_api_choice == 'random':
-        return [choice(list(AVAILABLE_TRANSLATION_APIS.values()))]
-    return [AVAILABLE_TRANSLATION_APIS[config.translate_api_choice]]
-
-
 async def handle_text_translate(
     text: str,
     source_language: str,
     target_language: str,
 ) -> list[str]:
     results = []
-    apis = await choose_api()
+    api_names = config.text_translate_apis
+    apis = [AVAILABLE_TRANSLATION_APIS.get(name) for name in api_names]
     if not apis:
         return ['无可用翻译API']
+    if config.text_translate_mode == 'auto':
+        apis = [apis.pop(0)]
+        # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
     async with AsyncClient() as client:
         if target_language == 'auto':
             if source_language == 'auto':
@@ -87,9 +76,13 @@ async def handle_image_translate(
     target_language: str,
 ) -> list[tuple[list[str], Optional[bytes]]]:
     results = []
-    apis = await choose_api()
+    api_names = config.image_translate_apis
+    apis = [AVAILABLE_TRANSLATION_APIS.get(name) for name in api_names]
     if not apis:
         return [(['无可用翻译API'], None)]
+    if config.image_translate_mode == 'auto':
+        apis = [apis.pop(0)]
+        # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
     async with AsyncClient() as client:
         for api_class in apis:
             api: TA = api_class(client)
