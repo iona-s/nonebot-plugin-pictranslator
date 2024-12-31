@@ -23,17 +23,29 @@ _✨ NoneBot 插件简单描述 ✨_
 
 ## 📖 介绍
 
-一个基于Nonebot2的插件，提供多个api的文本及图片翻译功能，附带中英词典和ocr功能。\
+一个基于Nonebot2的插件，提供多个api的文本及图片翻译功能，附带中英词典和ocr功能。
 # WIP
 
 ## 支持的api
+一般来说只要百度API就够用了，如果想同时返回多个API的结果，可以在[配置](#-配置)中设置对应`TRANSLATE_MODE`为`all`
+### 图片翻译
+- [x] [有道](https://ai.youdao.com/)  质量最好，但仅在注册账号时发放一次性免费余额
+- [x] [百度](https://fanyi-api.baidu.com/)  比有道稍差，不过免费额度每月刷新
+- [x] [腾讯](https://ai.qq.com/)  API不支持整段识别，且不返回渲染后的图片，故对复杂图片质量较差，不推荐，尽管免费额度每月刷新
+
+### 文本翻译
+- [x] [腾讯](https://ai.qq.com/)  免费额度每月刷新，量大
+- [x] [有道](https://ai.youdao.com/)  仅在注册账号时发放一次性免费余额
+- [ ] [百度](https://fanyi-api.baidu.com/)  免费额度每月刷新，额度比腾讯少
+
 ### 词典功能
 - [x] [天聚数行](https://www.tianapi.com/apiview/49)
 
-### 图文翻译
-- [x] [腾讯](https://ai.qq.com/)  腾讯图片翻译返回的是每行识别，且不返回渲染后的图片，故对复杂图片质量可能较差，但免费额度每月刷新。
-- [x] [有道](https://ai.youdao.com/)  质量最好，但仅在注册账号时发放一次性免费余额
-- [ ] [百度](https://fanyi-api.baidu.com/)  WIP
+### 语种识别
+用于在未指定目标语言时检测源语言来自动选择目标语言
+- [x] [腾讯](https://ai.qq.com/)
+- [ ] [百度](https://fanyi-api.baidu.com/)
+- [ ] [有道](https://ai.youdao.com/)  没有对应API
 
 ## 💿 安装
 
@@ -77,7 +89,7 @@ _✨ NoneBot 插件简单描述 ✨_
 
 打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分追加写入
 
-    plugins = ["nonebot_plugin_template"]
+    plugins = ["nonebot_plugin_pictranslator"]
 
 </details>
 

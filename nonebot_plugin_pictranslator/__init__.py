@@ -1,3 +1,4 @@
+from re import match
 from pathlib import Path
 from base64 import b64encode
 from typing import Any, Union
@@ -43,7 +44,7 @@ __plugin_meta__ = PluginMetadata(
 
 
 dictionary_handler = on_regex(r'^(?:词典|查词)(.+)')
-translate_handler = on_regex(r'^(图片)?(?:翻译|(.+)译([^\s]+)) ?(.*)')
+translate_handler = on_regex(r'^(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)')
 ocr_handler = on_startswith('ocr')
 
 
@@ -69,11 +70,21 @@ async def translate(
         match_group[1],
         match_group[2],
     )
-    if target_language is None:
-        await translate_handler.finish(source_language)  # 实际上是错误信息
-    image_search = bool(match_group[0])
-    translate_content = match_group[3].strip()
     msg = await UniMessage.generate(event=event)
+    if target_language is None:
+        # 避免因为图片导致误判
+        plain_text = msg.extract_plain_text()
+        new_match = match(r'^(图片)?(?:翻译|(.+)译(\S+)) ?(.*)', plain_text)
+        if new_match:
+            source_language, target_language = get_languages(
+                new_match.group(2),
+                new_match.group(3),
+            )
+        if not new_match or not target_language:
+            await translate_handler.finish(source_language)  # 实际上是错误信息
+    image_search = bool(match_group[0])
+    images = await extract_images(msg)
+    translate_content = images if images else match_group[3].strip()
     if Reply in msg:
         images = await extract_from_reply(msg, Image)
         if images:
@@ -127,7 +138,7 @@ async def translate(
     if target_language == 'auto':
         target_language = 'en' if source_language == 'zh' else 'zh'
         await translate_handler.send(
-            '图片翻译无法自动选择目标语言，默认翻译为中文。'
+            '图片翻译无法自动选择目标语言，默认翻译为中文。\n'
             '可使用[图片翻译<语言>]来指定',
         )
     await translate_handler.send('翻译中...')

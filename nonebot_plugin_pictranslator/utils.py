@@ -62,7 +62,7 @@ def add_node(
                     CustomNode(
                         uid=bot_id,
                         name='翻译姬',
-                        content=message_segment,
+                        content=message_segment.strip(),
                     ),
                 )
         else:
@@ -70,7 +70,7 @@ def add_node(
                 CustomNode(
                     uid=bot_id,
                     name='翻译姬',
-                    content=content,
+                    content=content.strip(),
                 ),
             )
     elif isinstance(content, bytes):

@@ -35,6 +35,7 @@ class BaseApi:
             return await self.client.request(method, url, **kwargs)
         except Exception as e:
             logger.error(f'Request [{method}] {url} failed: {e}')
+            logger.exception(e)
             return None
 
     async def _handle_request(

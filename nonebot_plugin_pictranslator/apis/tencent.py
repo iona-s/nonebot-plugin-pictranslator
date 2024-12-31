@@ -148,15 +148,14 @@ class TencentApi(TranslateApi):
             'ProjectId': config.tencent_project_id,
         }
         headers = self._construct_headers('LanguageDetect', payload)
-        return (
-            await self._handle_request(
-                url='https://tmt.tencentcloudapi.com',
-                method='POST',
-                response_model=LanguageDetectionResponse,
-                json=payload,
-                headers=headers,
-            )
-        ).response
+        result = await self._handle_request(
+            url='https://tmt.tencentcloudapi.com',
+            method='POST',
+            response_model=LanguageDetectionResponse,
+            json=payload,
+            headers=headers,
+        )
+        return None if result is None else result.response
 
     async def language_detection(self, text: str) -> Optional[str]:
         result = await self._language_detection(text)
@@ -177,15 +176,14 @@ class TencentApi(TranslateApi):
             'ProjectId': config.tencent_project_id,
         }
         headers = self._construct_headers('TextTranslate', payload)
-        return (
-            await self._handle_request(
-                url='https://tmt.tencentcloudapi.com',
-                method='POST',
-                response_model=TextTranslationResponse,
-                json=payload,
-                headers=headers,
-            )
-        ).response
+        result = await self._handle_request(
+            url='https://tmt.tencentcloudapi.com',
+            method='POST',
+            response_model=TextTranslationResponse,
+            json=payload,
+            headers=headers,
+        )
+        return None if result is None else result.response
 
     async def text_translate(
         self,
@@ -222,16 +220,15 @@ class TencentApi(TranslateApi):
             'ProjectId': config.tencent_project_id,
         }
         headers = self._construct_headers('ImageTranslate', payload)
-        return (
-            await self._handle_request(
-                url='https://tmt.tencentcloudapi.com',
-                method='POST',
-                response_model=ImageTranslationResponse,
-                log_kwargs_to_trace=True,
-                json=payload,
-                headers=headers,
-            )
-        ).response
+        result = await self._handle_request(
+            url='https://tmt.tencentcloudapi.com',
+            method='POST',
+            response_model=ImageTranslationResponse,
+            log_kwargs_to_trace=True,
+            json=payload,
+            headers=headers,
+        )
+        return None if result is None else result.response
 
     async def image_translate(
         self,
@@ -248,8 +245,9 @@ class TencentApi(TranslateApi):
             return ['腾讯翻译出错'], None
         source_language_name = LANGUAGE_NAME_INDEX[result.source]
         target_language_name = LANGUAGE_NAME_INDEX[result.target]
-        msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}\n']
-        seg_translation_msgs = ['分块翻译:\n']
+        msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}']
+        seg_translation_msgs = ['分块翻译:']
+        # 腾讯是分行识别的，故增加一个整段文本
         whole_source_text = ''
         img = Image.open(BytesIO(b64decode(base64_image)))
         for image_record in result.image_records:
@@ -332,15 +330,14 @@ class TencentApi(TranslateApi):
             payload,
             service='ocr',
         )
-        return (
-            await self._handle_request(
-                url='https://ocr.tencentcloudapi.com',
-                method='POST',
-                response_model=OcrResponse,
-                json=payload,
-                headers=headers,
-            )
-        ).response
+        result = await self._handle_request(
+            url='https://ocr.tencentcloudapi.com',
+            method='POST',
+            response_model=OcrResponse,
+            json=payload,
+            headers=headers,
+        )
+        return None if result is None else result.response
 
     async def ocr(self, image: Union[str, bytes]) -> list[str]:
         result = await self._ocr(image)

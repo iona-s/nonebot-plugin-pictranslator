@@ -123,18 +123,12 @@ class YoudaoApi(TranslateApi):
         )
         if result is None:
             return ['有道翻译出错'], None
-        source_language = LANGUAGE_NAME_INDEX[result.source]
-        target_language = LANGUAGE_NAME_INDEX[result.target]
+        source_language_name = LANGUAGE_NAME_INDEX[result.source]
+        target_language_name = LANGUAGE_NAME_INDEX[result.target]
         msgs = [
-            f'有道翻译:\n{source_language} -> {target_language}',
-            '分块翻译:',
+            f'有道翻译:\n{source_language_name} -> {target_language_name}',
+            '分翻译:',
         ]
-
         for section in result.regions:
-            msgs.extend(
-                [
-                    f'{section.source_text}',
-                    f'->{section.target_text}',
-                ],
-            )
+            msgs.append(f'{section.source_text}\n->{section.target_text}')
         return msgs, b64decode(result.render_image)
