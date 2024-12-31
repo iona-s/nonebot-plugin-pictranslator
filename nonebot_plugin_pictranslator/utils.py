@@ -2,6 +2,7 @@ from typing import Union, Optional
 
 from nonebot.params import Message
 from nonebot_plugin_alconna.uniseg import (
+    Text,
     Image,
     Reply,
     UniMsg,
@@ -11,7 +12,7 @@ from nonebot_plugin_alconna.uniseg import (
 
 from .define import LANGUAGE_INDEX
 
-__all__ = ['get_languages', 'extract_images', 'add_node']
+__all__ = ['get_languages', 'extract_images', 'add_node', 'extract_from_reply']
 
 
 def get_languages(
@@ -27,6 +28,16 @@ def get_languages(
         source_language = 'auto'
         target_language = 'auto'
     return source_language, target_language
+
+
+async def extract_from_reply(
+    msg: UniMsg,
+    seg_type: Union[type[Image], type[Text]],
+) -> Optional[list[Union[Image, Text]]]:
+    if Reply not in msg:
+        return None
+    msg = await UniMessage.generate(message=msg[Reply, 0].msg)
+    return msg[seg_type]  # noqa
 
 
 async def extract_images(msg: UniMsg) -> list[Image]:

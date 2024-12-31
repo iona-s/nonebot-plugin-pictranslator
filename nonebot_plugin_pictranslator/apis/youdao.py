@@ -129,6 +129,7 @@ class YoudaoApi(TranslateApi):
             f'有道翻译:\n{source_language} -> {target_language}',
             '分块翻译:',
         ]
+
         for section in result.regions:
             msgs.extend(
                 [

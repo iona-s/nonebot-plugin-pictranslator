@@ -31,7 +31,9 @@ async def handle_dictionary(word: str) -> str:
         return ret.result.word + ':\n' + ret.result.content.replace('|', '\n')
 
 
-async def choose_api() -> list[type[TA]]:
+async def choose_api() -> (
+    list[type[TA]]
+):  # TODO 更复杂的选择逻辑，如区分文本和图片
     if config.translate_api_choice == 'all':
         api_choices = []
         for name, api in AVAILABLE_TRANSLATION_APIS.items():

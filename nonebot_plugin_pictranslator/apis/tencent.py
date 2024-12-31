@@ -249,11 +249,11 @@ class TencentApi(TranslateApi):
         source_language_name = LANGUAGE_NAME_INDEX[result.source]
         target_language_name = LANGUAGE_NAME_INDEX[result.target]
         msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}\n']
-        seg_translation_msg = ['分块翻译:\n']
+        seg_translation_msgs = ['分块翻译:\n']
         whole_source_text = ''
         img = Image.open(BytesIO(b64decode(base64_image)))
         for image_record in result.image_records:
-            seg_translation_msg.append(
+            seg_translation_msgs.append(
                 f'{image_record.source_text}\n'
                 f'->{image_record.target_text}\n',
             )
@@ -300,8 +300,8 @@ class TencentApi(TranslateApi):
             img.paste(bg, (image_record.x, image_record.y))
         img_output = BytesIO()
         img.save(img_output, format='PNG')
-        msgs.extend(seg_translation_msg)
         msgs.extend(['整段翻译:', f'原文:\n{whole_source_text}'])
+        # 腾讯图片翻译识别是每行分开的，故尝试合一起整段翻译
         if len(whole_source_text) < 6000:
             result = await self._text_translate(
                 whole_source_text,
@@ -314,6 +314,7 @@ class TencentApi(TranslateApi):
                 msgs.append(f'->{result.target_text}')
         else:
             msgs.append('文本过长，不提供整段翻译')
+        msgs.extend(seg_translation_msgs)
         return msgs, img_output.getvalue()
 
     async def _ocr(self, image: Union[str, bytes]) -> Optional[OcrContent]:
