@@ -7,12 +7,16 @@ from base64 import b64decode
 from ..config import config
 from .base_api import TranslateApi
 from ..define import LANGUAGE_NAME_INDEX
-from .response_models.baidu import ImageTranslationResponse
+from .response_models.baidu import (
+    ImageTranslationResponse,
+    LanguageDetectionResponse,
+    LanguageTranslationResponse,
+)
 
 
 class BaiduApi(TranslateApi):
     @staticmethod
-    def sign(payload: dict, q: str, *, sign_image) -> dict:
+    def sign(payload: dict, q: str, *, sign_image: bool = False) -> dict:
         salt = str(uuid4())
         extra = 'APICUIDmac' if sign_image else ''
         sign_string = (
@@ -32,13 +36,66 @@ class BaiduApi(TranslateApi):
         )
         return payload
 
+    async def _language_detection(
+        self,
+        text: str,
+    ) -> Optional[LanguageDetectionResponse]:
+        payload = {
+            'q': text,
+        }
+        payload = self.sign(payload, text)
+        return await self._handle_request(
+            url='https://fanyi-api.baidu.com/api/trans/vip/language',
+            method='POST',
+            response_model=LanguageDetectionResponse,
+            data=payload,
+        )
+
+    async def language_detection(self, text: str) -> Optional[str]:
+        result = await self._language_detection(text)
+        if result is None:
+            return None
+        return result.data.lang
+
+    async def _text_translate(
+        self,
+        text: str,
+        source_language: str,
+        target_language: str,
+    ) -> Optional[LanguageTranslationResponse]:
+        payload = {
+            'q': text,
+            'from': source_language,
+            'to': target_language,
+        }
+        payload = self.sign(payload, text)
+        return await self._handle_request(
+            url='https://fanyi-api.baidu.com/api/trans/vip/translate',
+            method='POST',
+            response_model=LanguageTranslationResponse,
+            data=payload,
+        )
+
     async def text_translate(
         self,
         text: str,
         source_language: str,
         target_language: str,
     ) -> str:
-        raise NotImplementedError
+        result = await self._text_translate(
+            text,
+            source_language,
+            target_language,
+        )
+        if result is None:
+            return '百度翻译出错'
+        data = result.data[0]
+        source_language_name = LANGUAGE_NAME_INDEX[result.source]
+        target_language_name = LANGUAGE_NAME_INDEX[result.target]
+        return (
+            f'百度翻译:\n{source_language_name}->{target_language_name}\n'
+            f'{data.target_text}'
+        )
 
     async def _image_translate(
         self,
@@ -91,6 +148,3 @@ class BaiduApi(TranslateApi):
         for section in data.content:
             msgs.append(f'{section.source_text}\n->{section.target_text}')
         return msgs, b64decode(data.render_image)
-
-    async def language_detection(self, text: str) -> str:
-        raise NotImplementedError

@@ -40,9 +40,6 @@ async def handle_text_translate(
     apis = [AVAILABLE_TRANSLATION_APIS.get(name) for name in api_names]
     if not apis:
         return ['无可用翻译API']
-    if config.text_translate_mode == 'auto':
-        apis = [apis.pop(0)]
-        # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
     async with AsyncClient() as client:
         if target_language == 'auto':
             if source_language == 'auto':
@@ -52,12 +49,18 @@ async def handle_text_translate(
                         '可使用[译<语言>]来指定',
                     )
                 else:
-                    if TencentApi in apis:
-                        api = TencentApi(client)
+                    for api_class in apis:
+                        if api_class == YoudaoApi:
+                            continue
+                        api = api_class(client)
                         source_language = await api.language_detection(text)
                         if source_language is None:
                             results.append('查询出错')
+                        break
             target_language = 'en' if source_language == 'zh' else 'zh'
+        if config.text_translate_mode == 'auto':
+            apis = [apis.pop(0)]
+            # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
         for api_class in apis:
             api: TA = api_class(client)
             results.append(
