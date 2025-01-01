@@ -143,7 +143,7 @@ class BaiduApi(TranslateApi):
         target_language_name = LANGUAGE_NAME_INDEX[data.target]
         msgs = [
             f'百度翻译:\n{source_language_name}->{target_language_name}',
-            '分翻译:',
+            '分段翻译:',
         ]
         for section in data.content:
             msgs.append(f'{section.source_text}\n->{section.target_text}')
