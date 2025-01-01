@@ -98,16 +98,16 @@ _✨ NoneBot 插件简单描述 ✨_
 
 |         配置项          |   必填   |           默认值            |             可填值              |                            说明                            |
 |:--------------------:|:------:|:------------------------:|:----------------------------:|:--------------------------------------------------------:|
-| TEXT_TRANSLATE_APIS  |   是    | [tencent, baidu, youdao] | List[tencent, baidu, youdao] |                   以什么优先级调用哪些api进行文本翻译                    |
-| IMAGE_TRANSLATE_APIS |   是    | [baidu, youdao, tencent] | List[tencent, youdao, baidu] |                   以什么优先级调用哪些api进行图片翻译                    |
-| TEXT_TRANSLATE_MODE  |   否    |          'auto'          |        'auto', 'all'         |      文本翻译模式，`auto`代表以优先级调用第一个可用api，`all`代表调用全部可用api      |
+| TEXT_TRANSLATE_APIS  |   是    | [tencent, baidu, youdao] | List[tencent, baidu, youdao] |                 启用哪些API，并以什么优先级调用进行文本翻译                  |
+| IMAGE_TRANSLATE_APIS |   是    | [baidu, youdao, tencent] | List[tencent, youdao, baidu] |                       图片翻译API选择，同上                       |
+| TEXT_TRANSLATE_MODE  |   否    |          'auto'          |        'auto', 'all'         |      文本翻译模式，`auto`代表以优先级调用第一个可用API，`all`代表调用全部可用api      |
 | IMAGE_TRANSLATE_MODE |   否    |          'auto'          |        'auto', 'all'         |                        图片翻译模式，同上                         |
 |       腾讯API相关        |   /    |            /             |              /               | 详见[腾讯文档](https://cloud.tencent.com/document/product/551) |
 |      TENCENT_ID      | 若使用则必填 |            无             |            String            |                     腾讯API的secret_id                      |
 |     TENCENT_KEY      | 若使用则必填 |            无             |            String            |                     腾讯API的secret_key                     |
 |     USE_TENCENT      |   否    |            /             |             Bool             |                  是否启用腾讯API，填写了上两项则默认启用                   |
 |  TENCENT_PROJECT_ID  |   否    |            0             |             Int              |                     腾讯API的project_id                     |
-|  TENCENT_API_REGION  |   否    |            无             |            String            |                     腾讯API的secret_key                     |
+|  TENCENT_API_REGION  |   否    |       ap-shanghai        |            String            |                      腾讯API的region参数                      |
 |       有道API相关        |   /    |            /             |              /               |       详见[有道文档](https://fanyi.youdao.com/openapi/)        |
 |      YOUDAO_ID       | 若使用则必填 |            无             |            String            |                    有道翻译API的secret_id                     |
 |      YOUDAO_KEY      | 若使用则必填 |            无             |            String            |                    有道翻译API的secret_key                    |

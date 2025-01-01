@@ -92,7 +92,7 @@ class Config(BaseModel):
                 setattr(self, f'use_{name}', True)
         if self.text_translate_apis is None:
             self.text_translate_apis = []
-            for name in ('youdao', 'baidu', 'tencent'):
+            for name in ('baidu', 'youdao', 'tencent'):
                 if getattr(self, f'use_{name}'):
                     self.text_translate_apis.append(name)
         if self.image_translate_apis is None:
