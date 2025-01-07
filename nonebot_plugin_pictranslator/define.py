@@ -1,3 +1,6 @@
+# TODO 重写语言代码和名字获取
+from typing import Literal
+
 LANGUAGE_NAME_INDEX = {
     'zh': '简体中文',
     'zh-TW': '繁体中文',
@@ -47,3 +50,6 @@ for language, surnames in LANGUAGE_SURNAMES.items():
     for surname in surnames:
         LANGUAGE_INDEX[surname] = language
 LANGUAGE_INDEX['翻'] = 'auto'
+
+SUPPORTED_APIS = ('tencent', 'youdao', 'baidu')
+SUPPORTED_API = Literal['tencent', 'youdao', 'baidu']

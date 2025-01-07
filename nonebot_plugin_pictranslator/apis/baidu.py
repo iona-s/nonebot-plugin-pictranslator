@@ -119,8 +119,6 @@ class BaiduApi(TranslateApi):
             url='https://fanyi-api.baidu.com/api/trans/sdk/picture',
             method='POST',
             response_model=ImageTranslationResponse,
-            log_kwargs_to_trace=True,
-            log_response_to_trace=True,
             data=payload,
             files=image,
         )

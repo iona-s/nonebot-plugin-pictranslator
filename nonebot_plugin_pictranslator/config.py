@@ -3,15 +3,17 @@ from typing import Literal, Optional
 from nonebot import get_plugin_config
 from pydantic import Field, BaseModel
 
+from .define import SUPPORTED_API, SUPPORTED_APIS
+
 __all__ = ['config', 'Config']
 
 
 class Config(BaseModel):
-    text_translate_apis: list[Literal['tencent', 'youdao', 'baidu']] = Field(
+    text_translate_apis: list[SUPPORTED_API] = Field(
         default=None,
         description='文本翻译API的优先级，从高到低，默认以腾讯->百度->有道的顺序调用',
     )
-    image_translate_apis: list[Literal['tencent', 'youdao', 'baidu']] = Field(
+    image_translate_apis: list[SUPPORTED_API] = Field(
         default=None,
         description='图片翻译API的优先级，从高到低，默认以百度->有道->腾讯的顺序调用',
     )
@@ -80,10 +82,11 @@ class Config(BaseModel):
         description='是否启用天行数据API，填写了上一项则默认启用',
     )
 
-    def initialize(self) -> None:
+    def initialize(self) -> None:  # TODO 用validator重写？
         if self.use_tianapi is None and self.tianapi_key:
             self.use_tianapi = True
-        for name in ('tencent', 'youdao', 'baidu'):
+        for name in SUPPORTED_APIS:
+            name: SUPPORTED_API  # to pass type check
             if (
                 getattr(self, f'use_{name}') is None
                 and getattr(self, f'{name}_id')
@@ -92,12 +95,12 @@ class Config(BaseModel):
                 setattr(self, f'use_{name}', True)
         if self.text_translate_apis is None:
             self.text_translate_apis = []
-            for name in ('baidu', 'youdao', 'tencent'):
+            for name in SUPPORTED_APIS:
                 if getattr(self, f'use_{name}'):
                     self.text_translate_apis.append(name)
         if self.image_translate_apis is None:
             self.image_translate_apis = []
-            for name in ('tencent', 'baidu', 'youdao'):
+            for name in SUPPORTED_APIS:
                 if getattr(self, f'use_{name}'):
                     self.image_translate_apis.append(name)
 

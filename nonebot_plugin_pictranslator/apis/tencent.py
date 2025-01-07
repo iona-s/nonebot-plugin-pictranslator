@@ -224,7 +224,6 @@ class TencentApi(TranslateApi):
             url='https://tmt.tencentcloudapi.com',
             method='POST',
             response_model=ImageTranslationResponse,
-            log_kwargs_to_trace=True,
             json=payload,
             headers=headers,
         )
@@ -289,11 +288,13 @@ class TencentApi(TranslateApi):
                 - 1
             )
             font = ImageFont.truetype(_font, actual_font_size)
+            r, g, b = average_color
+            luminance = 0.299 * r + 0.587 * g + 0.114 * b
             bg_draw.multiline_text(
                 (0, 0),
                 image_record.target_text,
                 font=font,
-                fill=tuple(255 - i for i in average_color),
+                fill='white' if luminance > 128 else 'black',
             )
             img.paste(bg, (image_record.x, image_record.y))
         img_output = BytesIO()
