@@ -5,10 +5,10 @@ from pydantic import VERSION, BaseModel
 
 PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2
 
-if PYDANTIC_V2:
-    from pydantic import model_validator
-else:
-    from pydantic import root_validator  # noqa
+# if PYDANTIC_V2:
+#     from pydantic import model_validator
+# else:
+#     from pydantic import root_validator  # noqa
 
 __all__ = ['BaseResponseModel']
 
@@ -44,21 +44,21 @@ class BaseResponseModel(BaseModel):
             return super().model_validate_json(json_str)
         return super().parse_raw(json_str)  # noqa
 
-    if PYDANTIC_V2:
-
-        @model_validator(mode='before')
-        @classmethod
-        def strip_whitespace(cls, values):
-            for field, value in values.items():
-                if isinstance(value, str):
-                    values[field] = value.strip()
-            return values
-
-    else:
-
-        @root_validator(pre=True)  # noqa
-        def strip_whitespace(cls, values):  # noqa
-            for field, value in values.items():
-                if isinstance(value, str):
-                    values[field] = value.strip()
-            return values
+    # if PYDANTIC_V2:
+    #
+    #     @model_validator(mode='before')
+    #     @classmethod
+    #     def strip_whitespace(cls, values):
+    #         for field, value in values.items():
+    #             if isinstance(value, str):
+    #                 values[field] = value.strip()
+    #         return values
+    #
+    # else:
+    #
+    #     @root_validator(pre=True)  # noqa
+    #     def strip_whitespace(cls, values):  # noqa
+    #         for field, value in values.items():
+    #             if isinstance(value, str):
+    #                 values[field] = value.strip()
+    #         return values
