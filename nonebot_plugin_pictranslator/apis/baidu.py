@@ -148,7 +148,7 @@ class BaiduApi(TranslateApi):
             return ['百度翻译出错'], None
         data = result.data
         msgs = [
-            f'百度翻译:\n{Language.get(data.source).display_name("zh")}->',
+            f'百度翻译:\n{Language.get(data.source).display_name("zh")}->'
             f'{Language.get(data.target).display_name("zh")}\n',
             '分段翻译:',
         ]

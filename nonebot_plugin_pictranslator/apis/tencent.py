@@ -29,6 +29,8 @@ from .response_models.tencent import (
 
 __all__ = ['TencentApi']
 
+# TODO 图片翻译好像有点问题
+
 
 class TencentApi(TranslateApi):
     @staticmethod
