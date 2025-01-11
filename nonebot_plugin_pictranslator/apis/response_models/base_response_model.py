@@ -10,7 +10,7 @@ PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2
 # else:
 #     from pydantic import root_validator  # noqa
 
-__all__ = ['BaseResponseModel']
+__all__ = ['BaseResponseModel', 'PYDANTIC_V2']
 
 
 class BaseResponseModel(BaseModel):

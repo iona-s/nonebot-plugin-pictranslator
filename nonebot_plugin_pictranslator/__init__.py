@@ -44,7 +44,8 @@ __plugin_meta__ = PluginMetadata(
 
 
 dictionary_handler = on_regex(r'^/(?:词典|查词)(.+)')
-translate_handler = on_regex(r'^/(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)')
+translate_re_pattern = r'^/(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
+translate_handler = on_regex(translate_re_pattern)
 ocr_handler = on_startswith('/ocr', ignorecase=True)
 
 
@@ -74,14 +75,14 @@ async def translate(
     if target_language is None:
         # 避免因为图片导致误判
         plain_text = msg.extract_plain_text()
-        new_match = match(r'^(图片)?(?:翻译|(.+)译(\S+)) ?(.*)', plain_text)
+        new_match = match(translate_re_pattern, plain_text)
         if new_match:
             source_language, target_language = get_languages(
                 new_match.group(2),
                 new_match.group(3),
             )
         if not new_match or not target_language:
-            await translate_handler.finish(source_language)  # 实际上是错误信息
+            await translate_handler.finish('语言输入有误或不支持')
     image_search = bool(match_group[0])
     images = await extract_images(msg)
     translate_content = images if images else match_group[3].strip()

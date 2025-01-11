@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Optional
 
 from nonebot import logger
+from langcodes import Language
 from pydantic import ValidationError
 from httpx import Response, AsyncClient
 
+from ..define import LANGUAGE_TYPE
 from .response_models.base_response_model import BaseResponseModel
 
 __all__ = ['BaseApi', 'TranslateApi', 'R', 'TA']
@@ -57,16 +59,21 @@ class BaseApi:
 
 
 class TranslateApi(BaseApi, ABC):
+    @staticmethod
     @abstractmethod
-    async def language_detection(self, text: str) -> Optional[str]:
+    def _get_language(lang: LANGUAGE_TYPE) -> str:
+        pass
+
+    @abstractmethod
+    async def language_detection(self, text: str) -> Optional[Language]:
         pass
 
     @abstractmethod
     async def text_translate(
         self,
         text: str,
-        source_language: str,
-        target_language: str,
+        source_language: LANGUAGE_TYPE,
+        target_language: Language,
     ) -> str:
         pass
 
@@ -74,7 +81,7 @@ class TranslateApi(BaseApi, ABC):
     async def image_translate(
         self,
         base64_image: bytes,
-        source_language: str,
-        target_language: str,
+        source_language: LANGUAGE_TYPE,
+        target_language: Language,
     ) -> tuple[list[str], Optional[bytes]]:
         pass

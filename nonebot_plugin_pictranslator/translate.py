@@ -1,8 +1,11 @@
 from typing import Union, Optional
 
+from nonebot import logger
 from httpx import AsyncClient
+from langcodes import Language
 
 from .config import config
+from .define import LANGUAGE_TYPE
 from .apis import (
     TA,
     AVAILABLE_TRANSLATION_APIS,
@@ -32,8 +35,8 @@ async def handle_dictionary(word: str) -> str:
 
 async def handle_text_translate(
     text: str,
-    source_language: str,
-    target_language: str,
+    source_language: LANGUAGE_TYPE,
+    target_language: LANGUAGE_TYPE,
 ) -> list[str]:
     results = []
     api_names = config.text_translate_apis
@@ -55,9 +58,18 @@ async def handle_text_translate(
                         api = api_class(client)
                         source_language = await api.language_detection(text)
                         if source_language is None:
-                            results.append('查询出错')
+                            results.append('语种识别出错')
+                            source_language: LANGUAGE_TYPE = 'auto'
+                        if not source_language.has_name_data():
+                            warn_msg = f'语种识别可能有误 {source_language}'
+                            results.append(warn_msg)
+                            logger.warning(warn_msg)
                         break
-            target_language = 'en' if source_language == 'zh' else 'zh'
+            target_language = (
+                Language.make('en')
+                if source_language.language == 'zh'
+                else Language.make('zh')
+            )
         if config.text_translate_mode == 'auto':
             apis = [apis.pop(0)]
             # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
@@ -75,8 +87,8 @@ async def handle_text_translate(
 
 async def handle_image_translate(
     base64_image: bytes,
-    source_language: str,
-    target_language: str,
+    source_language: LANGUAGE_TYPE,
+    target_language: Language,
 ) -> list[tuple[list[str], Optional[bytes]]]:
     results = []
     api_names = config.image_translate_apis

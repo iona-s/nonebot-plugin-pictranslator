@@ -1,5 +1,7 @@
 from typing import Union, Optional
 
+from nonebot import logger
+from langcodes import Language
 from nonebot.params import Message
 from nonebot_plugin_alconna.uniseg import (
     Text,
@@ -10,20 +12,40 @@ from nonebot_plugin_alconna.uniseg import (
     UniMessage,
 )
 
-from .define import LANGUAGE_INDEX
+from .define import LANGUAGE_TYPE
 
 __all__ = ['get_languages', 'extract_images', 'add_node', 'extract_from_reply']
+
+
+def get_language(
+    lang: Optional[str],
+) -> Optional[Language]:
+    if lang is None:
+        return None
+    lang_str = lang + '文' if not lang.endswith(('语', '文')) else lang
+    try:
+        result_lang = Language.find(lang_str)
+    except LookupError:
+        result_lang = Language.get(lang)
+        if result_lang.has_name_data():
+            return result_lang
+        logger.error(f'无法识别的语言: {lang}')
+        return None
+    return result_lang
+
+
+RET_TYPE = Optional[LANGUAGE_TYPE]
 
 
 def get_languages(
     source: Optional[str],
     target: Optional[str],
-) -> tuple[str, Optional[str]]:
+) -> tuple[RET_TYPE, RET_TYPE]:
     if source and target:
-        source_language = LANGUAGE_INDEX.get(source, None)
-        target_language = LANGUAGE_INDEX.get(target, None)
+        source_language = get_language(source)
+        target_language = get_language(target)
         if not source_language or not target_language:
-            return '语言输入有误或不支持', None
+            return None, None
     else:
         source_language = 'auto'
         target_language = 'auto'

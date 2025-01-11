@@ -9,12 +9,13 @@ from hmac import new as hmac_new
 from datetime import datetime, timezone
 from typing import Union, Literal, Optional
 
+from langcodes import Language
 from PIL import Image, ImageDraw, ImageFont
 from httpx import __version__ as httpx_version
 
 from ..config import config
+from ..define import LANGUAGE_TYPE
 from .base_api import TranslateApi
-from ..define import LANGUAGE_NAME_INDEX
 from .response_models.tencent import (
     OcrContent,
     OcrResponse,
@@ -30,6 +31,14 @@ __all__ = ['TencentApi']
 
 
 class TencentApi(TranslateApi):
+    @staticmethod
+    def _get_language(lang: LANGUAGE_TYPE) -> str:
+        if lang == 'auto':
+            return 'auto'
+        if lang.maximize() == Language.get('zh-Hant').maximize():
+            return 'zh-TW'
+        return lang.language
+
     @staticmethod
     def _sign(key, msg):
         return hmac_new(key, msg.encode('utf-8'), sha256).digest()
@@ -157,11 +166,11 @@ class TencentApi(TranslateApi):
         )
         return None if result is None else result.response
 
-    async def language_detection(self, text: str) -> Optional[str]:
+    async def language_detection(self, text: str) -> Optional[Language]:
         result = await self._language_detection(text)
         if result is None:
             return None
-        return result.lang
+        return Language.get(result.lang)
 
     async def _text_translate(
         self,
@@ -188,20 +197,21 @@ class TencentApi(TranslateApi):
     async def text_translate(
         self,
         text: str,
-        source_language: str,
-        target_language: str,
+        source_language: LANGUAGE_TYPE,
+        target_language: Language,
     ) -> str:
         result = await self._text_translate(
             text,
-            source_language,
-            target_language,
+            self._get_language(source_language),
+            self._get_language(target_language),
         )
         if result is None:
             return '腾讯翻译出错'
-        source_language = LANGUAGE_NAME_INDEX[result.source]
-        target_language = LANGUAGE_NAME_INDEX[result.target]
+        source_language = Language.get(result.source)
+        target_language = Language.get(result.target)
         return (
-            f'腾讯翻译:\n{source_language}->{target_language}:\n'
+            f'腾讯翻译:\n{source_language.language_name("zh")}->'
+            f'{target_language.language_name("zh")}:\n'
             f'{result.target_text}'
         )
 
@@ -232,19 +242,22 @@ class TencentApi(TranslateApi):
     async def image_translate(
         self,
         base64_image: bytes,
-        source_language: str,
-        target_language: str,
+        source_language: LANGUAGE_TYPE,
+        target_language: Language,
     ) -> tuple[list[str], Optional[bytes]]:
         result = await self._image_translate(
             base64_image,
-            source_language,
-            target_language,
+            self._get_language(source_language),
+            self._get_language(target_language),
         )
         if result is None:
             return ['腾讯翻译出错'], None
-        source_language_name = LANGUAGE_NAME_INDEX[result.source]
-        target_language_name = LANGUAGE_NAME_INDEX[result.target]
-        msgs = [f'腾讯翻译:\n{source_language_name}->{target_language_name}']
+        source_language = Language.get(result.source)
+        target_language = Language.get(result.target)
+        msgs = [
+            f'腾讯翻译:\n{source_language.language_name("zh")}->'
+            f'{target_language.language_name("zh")}:\n',
+        ]
         seg_translation_msgs = ['分块翻译:']
         # 腾讯是分行识别的，故增加一个整段文本
         whole_source_text = ''
@@ -344,7 +357,7 @@ class TencentApi(TranslateApi):
         result = await self._ocr(image)
         if result is None:
             return ['OCR失败']
-        msgs = [f'语言: {LANGUAGE_NAME_INDEX[result.language]}']
+        msgs = [f'语言: {Language.get(result.language).display_name("zh")}']
         seg_msgs = ['分段:']
         whole_text = ''
         for text in result.text_detections:

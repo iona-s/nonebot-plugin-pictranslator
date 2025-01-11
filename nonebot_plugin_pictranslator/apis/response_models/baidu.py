@@ -2,7 +2,13 @@ from typing import Optional
 
 from pydantic import Field
 
-from .base_response_model import BaseResponseModel
+from ...define import REVERSE_BAIDU_LANG_CODE_MAP
+from .base_response_model import PYDANTIC_V2, BaseResponseModel
+
+if PYDANTIC_V2:
+    from pydantic import model_validator
+else:
+    from pydantic import root_validator  # noqa
 
 
 class LanguageDetectionData(BaseResponseModel):
@@ -15,16 +21,45 @@ class LanguageDetectionResponse(BaseResponseModel):
     data: LanguageDetectionData = Field(..., description='语言检测结果数据')
 
 
+class ModifiedBaiduModel(BaseResponseModel):
+    # 用于修正百度返回的不标准语言代码，如jp -> ja
+
+    if PYDANTIC_V2:
+
+        @model_validator(mode='after')
+        @classmethod
+        def correct_lang(cls, values):
+            for field, value in values.items():
+                if field in ('source', 'target'):
+                    values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
+                        value,
+                        value,
+                    )
+            return values
+
+    else:
+
+        @root_validator()  # noqa
+        def correct_lang(cls, values):  # noqa
+            for field, value in values.items():
+                if field in ('source', 'target'):
+                    values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
+                        value,
+                        value,
+                    )
+            return values
+
+
 class LanguageTranslationData(BaseResponseModel):
     source_text: str = Field(..., alias='src', description='源文本')
     target_text: str = Field(..., alias='dst', description='目标文本')
 
 
-class LanguageTranslationResponse(BaseResponseModel):
+class LanguageTranslationResponse(ModifiedBaiduModel):
     error_code: Optional[str] = Field(default=None, description='错误码')
     error_msg: Optional[str] = Field(default=None, description='错误信息')
     source: str = Field(..., alias='from', description='源语言')
-    target: str = Field(..., alias='from', description='目标语言')
+    target: str = Field(..., alias='to', description='目标语言')
     data: list[LanguageTranslationData] = Field(
         ...,
         alias='trans_result',
@@ -38,7 +73,7 @@ class ImageTranslationSection(BaseResponseModel):
     # 其余参数用不上
 
 
-class ImageTranslationData(BaseResponseModel):
+class ImageTranslationData(ModifiedBaiduModel):
     source: str = Field(..., alias='from', description='源语言')
     target: str = Field(..., alias='to', description='目标语言')
     source_text: str = Field(
