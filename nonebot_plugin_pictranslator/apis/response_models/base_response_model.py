@@ -1,16 +1,18 @@
 from typing import Any
 from typing_extensions import Self
 
-from pydantic import VERSION, BaseModel
+from pydantic import BaseModel
 
-PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2
+from ...define import PYDANTIC_V2
 
 # if PYDANTIC_V2:
 #     from pydantic import model_validator
+#     model_validator = model_validator(mode='before')
 # else:
 #     from pydantic import root_validator  # noqa
+#     model_validator = root_validator(pre=True)  # noqa
 
-__all__ = ['BaseResponseModel', 'PYDANTIC_V2']
+__all__ = ['BaseResponseModel']
 
 
 class BaseResponseModel(BaseModel):
@@ -44,21 +46,10 @@ class BaseResponseModel(BaseModel):
             return super().model_validate_json(json_str)
         return super().parse_raw(json_str)  # noqa
 
-    # if PYDANTIC_V2:
-    #
-    #     @model_validator(mode='before')
-    #     @classmethod
-    #     def strip_whitespace(cls, values):
-    #         for field, value in values.items():
-    #             if isinstance(value, str):
-    #                 values[field] = value.strip()
-    #         return values
-    #
-    # else:
-    #
-    #     @root_validator(pre=True)  # noqa
-    #     def strip_whitespace(cls, values):  # noqa
-    #         for field, value in values.items():
-    #             if isinstance(value, str):
-    #                 values[field] = value.strip()
-    #         return values
+    # @model_validator
+    # @classmethod
+    # def strip_whitespace(cls, values):
+    #     for field, value in values.items():
+    #         if isinstance(value, str):
+    #             values[field] = value.strip()
+    #     return values

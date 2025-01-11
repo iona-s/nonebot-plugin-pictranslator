@@ -2,13 +2,17 @@ from typing import Optional
 
 from pydantic import Field
 
-from ...define import REVERSE_BAIDU_LANG_CODE_MAP
-from .base_response_model import PYDANTIC_V2, BaseResponseModel
+from .base_response_model import BaseResponseModel
+from ...define import PYDANTIC_V2, REVERSE_BAIDU_LANG_CODE_MAP
 
 if PYDANTIC_V2:
     from pydantic import model_validator
+
+    model_validator = model_validator(mode='after')
 else:
     from pydantic import root_validator  # noqa
+
+    model_validator = root_validator()  # noqa
 
 
 class LanguageDetectionData(BaseResponseModel):
@@ -23,31 +27,16 @@ class LanguageDetectionResponse(BaseResponseModel):
 
 class ModifiedBaiduModel(BaseResponseModel):
     # 用于修正百度返回的不标准语言代码，如jp -> ja
-
-    if PYDANTIC_V2:
-
-        @model_validator(mode='after')
-        @classmethod
-        def correct_lang(cls, values):
-            for field, value in values.items():
-                if field in ('source', 'target'):
-                    values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
-                        value,
-                        value,
-                    )
-            return values
-
-    else:
-
-        @root_validator()  # noqa
-        def correct_lang(cls, values):  # noqa
-            for field, value in values.items():
-                if field in ('source', 'target'):
-                    values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
-                        value,
-                        value,
-                    )
-            return values
+    @model_validator
+    @classmethod
+    def correct_lang(cls, values):
+        for field, value in values.items():
+            if field in ('source', 'target'):
+                values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
+                    value,
+                    value,
+                )
+        return values
 
 
 class LanguageTranslationData(BaseResponseModel):

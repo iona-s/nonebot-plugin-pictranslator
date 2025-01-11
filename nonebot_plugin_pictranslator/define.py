@@ -1,13 +1,16 @@
 from typing import Union, Literal
 
+from pydantic import VERSION
 from langcodes import Language
+
+PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2
 
 SUPPORTED_APIS = ('tencent', 'youdao', 'baidu')
 SUPPORTED_API = Literal['tencent', 'youdao', 'baidu']
 
 LANGUAGE_TYPE = Union[Literal['auto'], Language]
 
-# TODO 百度这边很乱，先弄几个常用语言的了
+# 百度这边很乱，先弄几个常用语言的了
 BAIDU_LANG_CODE_MAP = {
     'zh-Hant': 'cht',
     'ja': 'jp',
