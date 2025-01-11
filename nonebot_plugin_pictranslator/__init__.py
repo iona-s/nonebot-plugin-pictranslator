@@ -43,9 +43,9 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-dictionary_handler = on_regex(r'^(?:词典|查词)(.+)')
-translate_handler = on_regex(r'^(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)')
-ocr_handler = on_startswith('ocr', ignorecase=True)
+dictionary_handler = on_regex(r'^/(?:词典|查词)(.+)')
+translate_handler = on_regex(r'^/(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)')
+ocr_handler = on_startswith('/ocr', ignorecase=True)
 
 
 @dictionary_handler.handle()
