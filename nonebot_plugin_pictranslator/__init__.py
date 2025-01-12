@@ -138,11 +138,10 @@ async def translate(
             ),
         )
     if target_language == 'auto':
-        target_language = (
-            Language.make('en')
-            if source_language.language == 'zh'
-            else Language.make('zh')
-        )
+        if source_language == 'auto' or source_language.language != 'zh':
+            target_language = Language.make('zh')
+        else:
+            target_language = Language.make('en')
         await translate_handler.send(
             '图片翻译无法自动选择目标语言，默认翻译为中文。\n'
             '可使用[图片翻译<语言>]来指定',
