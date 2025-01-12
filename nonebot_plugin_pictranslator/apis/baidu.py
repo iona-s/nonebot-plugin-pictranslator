@@ -147,8 +147,12 @@ class BaiduApi(TranslateApi):
         if result is None:
             return ['百度翻译出错'], None
         data = result.data
+        if data.source == 'auto':
+            source_name = '自动检测'
+        else:
+            source_name = Language.get(data.source).display_name('zh')
         msgs = [
-            f'百度翻译:\n{Language.get(data.source).display_name("zh")}->'
+            f'百度翻译:\n{source_name}->'
             f'{Language.get(data.target).display_name("zh")}\n',
             '分段翻译:',
         ]

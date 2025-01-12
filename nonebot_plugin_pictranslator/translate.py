@@ -40,7 +40,7 @@ async def handle_text_translate(
 ) -> list[str]:
     results = []
     api_names = config.text_translate_apis
-    apis = [AVAILABLE_TRANSLATION_APIS.get(name) for name in api_names]
+    apis = [AVAILABLE_TRANSLATION_APIS[name] for name in api_names]
     if not apis:
         return ['无可用翻译API']
     async with AsyncClient() as client:
