@@ -3,16 +3,7 @@ from typing import Literal, Optional
 from nonebot import get_plugin_config
 from pydantic import Field, BaseModel
 
-from .define import PYDANTIC_V2, SUPPORTED_API, SUPPORTED_APIS
-
-if PYDANTIC_V2:
-    from pydantic import model_validator
-
-    model_validator = model_validator(mode='after')
-else:
-    from pydantic import root_validator  # noqa
-
-    model_validator = root_validator()  # noqa
+from .define import SUPPORTED_API, SUPPORTED_APIS
 
 __all__ = ['config', 'Config']
 
@@ -72,7 +63,9 @@ class Config(BaseModel):
     baidu_id: Optional[str] = Field(
         default=None,
         description='百度翻译API的应用id',
+        coerce_numbers_to_str=True,
     )
+
     baidu_key: Optional[str] = Field(
         default=None,
         description='百度翻译API的应用秘钥',
@@ -91,29 +84,28 @@ class Config(BaseModel):
         description='是否启用天行数据API，填写了上一项则默认启用',
     )
 
-    @model_validator
-    @classmethod
-    def initialize(cls, values):
-        for field, value in values.items():
+    def initialize(self) -> None:
+        if self.use_tianapi is None and self.tianapi_key:
+            self.use_tianapi = True
+        for name in SUPPORTED_APIS:
+            name: SUPPORTED_API
             if (
-                field == 'use_tianapi'
-                and value is None
-                and values.get('tianapi_key')
+                getattr(self, f'use_{name}') is None
+                and getattr(self, f'{name}_id')
+                and getattr(self, f'{name}_key')
             ):
-                values[field] = True
-            elif field.startswith('use_') and value is None:
-                name = field[4:]
-                if values.get(f'{name}_id') and values.get(f'{name}_key'):
-                    values[field] = True
-        if values.get('text_translate_apis') is None:
-            values['text_translate_apis'] = [
-                name for name in SUPPORTED_APIS if values.get(f'use_{name}')
-            ]
-        if values.get('image_translate_apis') is None:
-            values['image_translate_apis'] = [
-                name for name in SUPPORTED_APIS if values.get(f'use_{name}')
-            ]
-        return values
+                setattr(self, f'use_{name}', True)
+        if self.text_translate_apis is None:
+            self.text_translate_apis = []
+            for name in SUPPORTED_APIS:
+                if getattr(self, f'use_{name}'):
+                    self.text_translate_apis.append(name)
+        if self.image_translate_apis is None:
+            self.image_translate_apis = []
+            for name in SUPPORTED_APIS:
+                if getattr(self, f'use_{name}'):
+                    self.image_translate_apis.append(name)
 
 
 config = get_plugin_config(Config)
+config.initialize()

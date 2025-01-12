@@ -1,4 +1,5 @@
 from typing import Optional
+from typing_extensions import Self
 
 from pydantic import Field
 
@@ -8,14 +9,29 @@ from ...define import PYDANTIC_V2, REVERSE_BAIDU_LANG_CODE_MAP
 if PYDANTIC_V2:
     from pydantic import model_validator
 
-    model_validator = model_validator(mode='after')
+    class ModifiedBaiduModel(BaseResponseModel):
+        @model_validator(mode='after')
+        def correct_lang(self) -> Self:
+            for attr in ('lang', 'source', 'target'):
+                value = getattr(self, attr, None)
+                if value in REVERSE_BAIDU_LANG_CODE_MAP:
+                    setattr(self, attr, REVERSE_BAIDU_LANG_CODE_MAP[value])
+            return self
+
 else:
     from pydantic import root_validator  # noqa
 
-    model_validator = root_validator()  # noqa
+    class ModifiedBaiduModel(BaseResponseModel):
+        @root_validator  # noqa
+        def correct_lang(cls, values):  # noqa N805
+            for attr in ('lang', 'source', 'target'):
+                value = values.get(attr)
+                if value in REVERSE_BAIDU_LANG_CODE_MAP:
+                    values[attr] = REVERSE_BAIDU_LANG_CODE_MAP[value]
+            return values
 
 
-class LanguageDetectionData(BaseResponseModel):
+class LanguageDetectionData(ModifiedBaiduModel):
     lang: str = Field(..., alias='src', description='语言代码')
 
 
@@ -23,20 +39,6 @@ class LanguageDetectionResponse(BaseResponseModel):
     error_code: str = Field(..., description='错误码')
     error_msg: str = Field(..., description='错误信息')
     data: LanguageDetectionData = Field(..., description='语言检测结果数据')
-
-
-class ModifiedBaiduModel(BaseResponseModel):
-    # 用于修正百度返回的不标准语言代码，如jp -> ja
-    @model_validator
-    @classmethod
-    def correct_lang(cls, values):
-        for field, value in values.items():
-            if field in ('source', 'target'):
-                values[field] = REVERSE_BAIDU_LANG_CODE_MAP.get(
-                    value,
-                    value,
-                )
-        return values
 
 
 class LanguageTranslationData(BaseResponseModel):
