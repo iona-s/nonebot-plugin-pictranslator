@@ -1,8 +1,8 @@
 from typing import Union, Optional
 
 from nonebot import logger
-from langcodes import Language
 from nonebot.params import Message
+from langcodes import Language, LanguageTagError
 from nonebot_plugin_alconna.uniseg import (
     Text,
     Image,
@@ -26,21 +26,22 @@ def get_language(
     try:
         result_lang = Language.find(lang_str)
     except LookupError:
-        result_lang = Language.get(lang)
-        if result_lang.has_name_data():
-            return result_lang
+        try:
+            result_lang = Language.get(lang)
+        except LanguageTagError:
+            pass
+        else:
+            if result_lang.has_name_data():
+                return result_lang
         logger.error(f'无法识别的语言: {lang}')
         return None
     return result_lang
 
 
-RET_TYPE = Optional[LANGUAGE_TYPE]
-
-
 def get_languages(
     source: Optional[str],
     target: Optional[str],
-) -> tuple[RET_TYPE, RET_TYPE]:
+) -> Union[tuple[None, None], tuple[LANGUAGE_TYPE, LANGUAGE_TYPE]]:
     if source and target:
         source_language = get_language(source)
         target_language = get_language(target)

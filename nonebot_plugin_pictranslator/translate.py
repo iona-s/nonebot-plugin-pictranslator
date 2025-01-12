@@ -58,18 +58,18 @@ async def handle_text_translate(
                         api = api_class(client)
                         source_language = await api.language_detection(text)
                         if source_language is None:
-                            results.append('语种识别出错')
+                            results.append('语种识别出错，已默认翻译为中文')
                             source_language: LANGUAGE_TYPE = 'auto'
+                            break
                         if not source_language.has_name_data():
                             warn_msg = f'语种识别可能有误 {source_language}'
                             results.append(warn_msg)
                             logger.warning(warn_msg)
                         break
-            target_language = (
-                Language.make('en')
-                if source_language.language == 'zh'
-                else Language.make('zh')
-            )
+            if source_language == 'auto' or source_language.language != 'zh':
+                target_language = Language.make('zh')
+            else:
+                target_language = Language.make('en')
         if config.text_translate_mode == 'auto':
             apis = [apis.pop(0)]
             # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上

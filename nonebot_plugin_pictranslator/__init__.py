@@ -3,6 +3,7 @@ from pathlib import Path
 from base64 import b64encode
 from typing import Any, Union
 
+from langcodes import Language
 from nonebot import Bot, require, on_regex, on_startswith
 
 require('nonebot_plugin_alconna')
@@ -137,7 +138,11 @@ async def translate(
             ),
         )
     if target_language == 'auto':
-        target_language = 'en' if source_language == 'zh' else 'zh'
+        target_language = (
+            Language.make('en')
+            if source_language.language == 'zh'
+            else Language.make('zh')
+        )
         await translate_handler.send(
             '图片翻译无法自动选择目标语言，默认翻译为中文。\n'
             '可使用[图片翻译<语言>]来指定',
