@@ -31,12 +31,6 @@ class YoudaoApi(TranslateApi):
 
     @staticmethod
     def sign(payload: dict) -> dict:
-        # 顺便将zh转换为zh-CHS
-        if payload['from'] == 'zh':
-            payload['from'] = 'zh-CHS'
-        if payload['to'] == 'zh':
-            payload['to'] = 'zh-CHS'
-
         salt = str(uuid4())
         curtime = str(int(time()))
         input_str = payload['q']

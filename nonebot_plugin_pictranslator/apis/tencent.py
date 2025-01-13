@@ -285,7 +285,9 @@ class TencentApi(TranslateApi):
                 average_color,
             )
             bg_draw = ImageDraw.Draw(bg)
-            _font = 'msyh.ttc' if target_language == 'zh' else 'arial.ttf'
+            _font = (
+                'msyh.ttc' if target_language.language == 'zh' else 'arial.ttf'
+            )
             _, _, text_width, text_height = bg_draw.textbbox(
                 (0, 0),
                 image_record.target_text,
@@ -309,7 +311,7 @@ class TencentApi(TranslateApi):
                 (0, 0),
                 image_record.target_text,
                 font=font,
-                fill='white' if luminance > 128 else 'black',
+                fill='white' if luminance < 128 else 'black',
             )
             img.paste(bg, (image_record.x, image_record.y))
         img_output = BytesIO()
