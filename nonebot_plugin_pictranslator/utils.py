@@ -74,6 +74,7 @@ def add_node(
     content: Union[str, bytes],
     bot_id: str,
 ) -> list[CustomNode]:
+    nickname = '翻译姬'
     if isinstance(content, str):
         if len(content) > 3000:  # qq消息长度限制，虽然大概率也不会超过
             for i in range(0, len(content), 2999):
@@ -84,7 +85,7 @@ def add_node(
                 nodes.append(
                     CustomNode(
                         uid=bot_id,
-                        name='翻译姬',
+                        name=nickname,
                         content=message_segment.strip(),
                     ),
                 )
@@ -92,7 +93,7 @@ def add_node(
             nodes.append(
                 CustomNode(
                     uid=bot_id,
-                    name='翻译姬',
+                    name=nickname,
                     content=content.strip(),
                 ),
             )
@@ -100,7 +101,7 @@ def add_node(
         nodes.append(
             CustomNode(
                 uid=bot_id,
-                name='翻译姬',
+                name=nickname,
                 content=UniMessage.image(raw=content),
             ),
         )
