@@ -1,7 +1,7 @@
 from typing import Union, Optional
 
-from nonebot import logger
 from nonebot.params import Message
+from nonebot import logger, get_driver
 from langcodes import Language, LanguageTagError
 from nonebot_plugin_alconna.uniseg import (
     Text,
@@ -20,7 +20,7 @@ __all__ = ['get_languages', 'extract_images', 'add_node', 'extract_from_reply']
 def get_language(
     lang: Optional[str],
 ) -> Optional[Language]:
-    if lang is None:
+    if lang is None or len(lang) > 10:
         return None
     lang_str = lang + '文' if not lang.endswith(('语', '文')) else lang
     try:
@@ -74,7 +74,19 @@ def add_node(
     content: Union[str, bytes],
     bot_id: str,
 ) -> list[CustomNode]:
-    nickname = '翻译姬'
+    global_config = get_driver().config
+    nickname = global_config.nickname
+    nickname = next(iter(nickname)) if nickname else '翻译姬'
+
+    def _add_node(node_content):
+        nodes.append(
+            CustomNode(
+                uid=bot_id,
+                name=nickname,
+                content=node_content,
+            ),
+        )
+
     if isinstance(content, str):
         if len(content) > 3000:  # qq消息长度限制，虽然大概率也不会超过
             for i in range(0, len(content), 2999):
@@ -82,27 +94,9 @@ def add_node(
                     message_segment = content[i:]
                 else:
                     message_segment = content[i : i + 2999]
-                nodes.append(
-                    CustomNode(
-                        uid=bot_id,
-                        name=nickname,
-                        content=message_segment.strip(),
-                    ),
-                )
+                _add_node(message_segment)
         else:
-            nodes.append(
-                CustomNode(
-                    uid=bot_id,
-                    name=nickname,
-                    content=content.strip(),
-                ),
-            )
+            _add_node(content.strip())
     elif isinstance(content, bytes):
-        nodes.append(
-            CustomNode(
-                uid=bot_id,
-                name=nickname,
-                content=UniMessage.image(raw=content),
-            ),
-        )
+        _add_node(UniMessage.image(raw=content))
     return nodes
