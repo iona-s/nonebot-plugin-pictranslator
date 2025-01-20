@@ -33,7 +33,7 @@ from .translate import (
 __plugin_meta__ = PluginMetadata(
     name='nonebot-plugin-pictranslator',
     description='一个支持图片翻译的nonebot2插件',
-    usage='翻译 [要翻译的内容]',
+    usage='/翻译 [要翻译的内容]',
     type='application',
     homepage='https://github.com/iona-s/nonebot-plugin-pictranslator',
     config=Config,

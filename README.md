@@ -8,7 +8,7 @@
 
 # nonebot-plugin-pictranslator
 
-_✨ NoneBot 插件简单描述 ✨_
+_✨ NoneBot 翻译插件 ✨_
 
 
 <a href="./LICENSE">
@@ -28,12 +28,12 @@ _✨ NoneBot 插件简单描述 ✨_
 ### 支持的API
 一般来说只要百度API就够用了，如果想同时返回多个API的结果，可以在[配置](#-配置)中填入多个api并将对应`TRANSLATE_MODE`该为`all`
 
-|                    API                     | 图片翻译 | 文本翻译 | 语种识别 | ocr | 词典 |
-|:------------------------------------------:|:----:|:----:|:----:|:---:|:--:|
-|        [有道](https://ai.youdao.com/)        |  ✅   |  ✅   |  ❌   |  ❌  | ❌  |
-|     [百度](https://fanyi-api.baidu.com/)     |  ✅   |  ✅   |  ✅   |  ❌  | ❌  |
-|          [腾讯](https://ai.qq.com/)          |  ✅   |  ✅   |  ✅   |  ✅  | ❌  |
-| [天聚数行](https://www.tianapi.com/apiview/49) |  ❌   |  ❌   |  ❌   |  ❌  | ✅  |
+|                     API                     | 图片翻译 | 文本翻译 | 语种识别 | ocr | 词典 |
+|:-------------------------------------------:|:----:|:----:|:----:|:---:|:--:|
+|        [有道](https://ai.youdao.com/)         |  ✅   |  ✅   |  ❌   |  ❌  | ❌  |
+|     [百度](https://fanyi-api.baidu.com/)      |  ✅   |  ✅   |  ✅   |  ❌  | ❌  |
+| [腾讯](https://cloud.tencent.com/product/tmt) |  ✅   |  ✅   |  ✅   |  ✅  | ❌  |
+| [天聚数行](https://www.tianapi.com/apiview/49)  |  ❌   |  ❌   |  ❌   |  ❌  | ✅  |
 
 有道整体来说质量最好，但免费额度只一次性发放\
 百度和腾讯的免费额度均每月刷新\
