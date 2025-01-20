@@ -172,7 +172,7 @@ class TencentApi(TranslateApi):
         result = await self._language_detection(text)
         if result is None:
             return None
-        return Language.get(result.lang)
+        return Language.get('ja' if result.lang == 'jp' else result.lang)
 
     async def _text_translate(
         self,
