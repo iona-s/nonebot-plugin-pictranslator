@@ -5,11 +5,10 @@ from langcodes import Language
 from nonebot import logger
 
 from .apis import (
-    AVAILABLE_TRANSLATION_APIS,
     TA,
     TencentApi,
     TianApi,
-    YoudaoApi,
+    get_apis,
 )
 from .config import config
 from .define import LANGUAGE_TYPE
@@ -33,30 +32,27 @@ async def handle_dictionary(word: str) -> str:
         return ret.result.word + ':\n' + ret.result.content.replace('|', '\n')
 
 
-async def handle_text_translate(  # noqa: C901 PLR0912
+async def handle_text_translate(
     text: str,
     source_language: LANGUAGE_TYPE,
     target_language: LANGUAGE_TYPE,
 ) -> list[str]:
     results = []
-    api_names = config.text_translate_apis
-    apis = [AVAILABLE_TRANSLATION_APIS[name] for name in api_names]
+    apis = get_apis('text')
     if not apis:
         return ['无可用翻译API']
     async with AsyncClient() as client:
         if target_language == 'auto':
             if source_language == 'auto':
-                if apis == [YoudaoApi]:
+                detection_api = get_apis('text', language_detection=True)
+                if not detection_api:
                     results.append(
                         '有道不提供语言检测API，故默认翻译为中文。'
                         '可使用[/译<语言>]来指定',
                     )
                     target_language = Language.make('zh')
                 else:
-                    for api_class in apis:
-                        if api_class != YoudaoApi:
-                            break
-                    api = api_class(client)
+                    api = detection_api.pop()(client)
                     detected_source = await api.language_detection(text)
                     if detected_source is None:
                         results.append('语种识别出错，已默认翻译为中文')
@@ -98,8 +94,7 @@ async def handle_image_translate(
     target_language: Language,
 ) -> list[tuple[list[str], Optional[bytes]]]:
     results = []
-    api_names = config.image_translate_apis
-    apis = [AVAILABLE_TRANSLATION_APIS.get(name) for name in api_names]
+    apis = get_apis('image')
     if not apis:
         return [(['无可用翻译API'], None)]
     if config.image_translate_mode == 'auto':
