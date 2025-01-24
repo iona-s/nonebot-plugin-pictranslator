@@ -1,16 +1,16 @@
-from time import time
-from uuid import uuid4
-from hashlib import sha256
-from typing import Optional
 from base64 import b64decode
+from hashlib import sha256
+from time import time
+from typing import Optional
+from uuid import uuid4
 
 from langcodes import Language
 
 from ..config import config
 from .base_api import TranslateApi
 from .response_models.youdao import (
-    TextTranslationResponse,
     ImageTranslationResponse,
+    TextTranslationResponse,
 )
 
 __all__ = ['YoudaoApi']
@@ -34,7 +34,8 @@ class YoudaoApi(TranslateApi):
         salt = str(uuid4())
         curtime = str(int(time()))
         input_str = payload['q']
-        if len(input_str) > 20:
+        threshold = 20
+        if len(input_str) > threshold:
             input_str = input_str[:10] + str(len(input_str)) + input_str[-10:]
         sign_str = (
             config.youdao_id + input_str + salt + curtime + config.youdao_key
@@ -51,7 +52,7 @@ class YoudaoApi(TranslateApi):
         )
         return payload
 
-    async def language_detection(self, text: str) -> Optional[str]:  # noqa
+    async def language_detection(self, text: str) -> Optional[str]:
         error_msg = '有道翻译API不支持语言检测'
         raise NotImplementedError(error_msg)
 
@@ -136,6 +137,10 @@ class YoudaoApi(TranslateApi):
             f'{target_language.display_name("zh")}',
             '分翻译:',
         ]
-        for section in result.regions:
-            msgs.append(f'{section.source_text}\n->{section.target_text}')
+        msgs.extend(
+            [
+                f'{section.source_text}\n->{section.target_text}'
+                for section in result.regions
+            ]
+        )
         return msgs, b64decode(result.render_image)

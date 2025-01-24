@@ -1,26 +1,27 @@
-from typing import Union, Optional
+from typing import Any, Optional, Union
 
-from nonebot.params import Message
-from nonebot import logger, get_driver
 from langcodes import Language, LanguageTagError
+from nonebot import get_driver, logger
+from nonebot.params import Message
 from nonebot_plugin_alconna.uniseg import (
-    Text,
+    CustomNode,
     Image,
     Reply,
-    UniMsg,
-    CustomNode,
+    Text,
     UniMessage,
+    UniMsg,
 )
 
 from .define import LANGUAGE_TYPE
 
-__all__ = ['get_languages', 'extract_images', 'add_node', 'extract_from_reply']
+__all__ = ['add_node', 'extract_from_reply', 'extract_images', 'get_languages']
 
 
 def get_language(
     lang: Optional[str],
 ) -> Optional[Language]:
-    if lang is None or len(lang) > 10:
+    threshold = 10
+    if lang is None or len(lang) > threshold:
         return None
     lang_str = lang + '文' if not lang.endswith(('语', '文')) else lang
     try:
@@ -60,13 +61,13 @@ async def extract_from_reply(
     if Reply not in msg:
         return None
     msg = await UniMessage.generate(message=msg[Reply, 0].msg)
-    return msg[seg_type]  # noqa
+    return msg[seg_type]
 
 
 async def extract_images(msg: UniMsg) -> list[Image]:
     if Reply in msg and isinstance((raw_reply := msg[Reply, 0].msg), Message):
         msg = await UniMessage.generate(message=raw_reply)
-    return msg[Image]  # noqa
+    return msg[Image]
 
 
 def add_node(
@@ -78,7 +79,7 @@ def add_node(
     nickname = global_config.nickname
     nickname = next(iter(nickname)) if nickname else '翻译姬'
 
-    def _add_node(node_content):
+    def _add_node(node_content: Any) -> None:
         nodes.append(
             CustomNode(
                 uid=bot_id,
@@ -88,15 +89,7 @@ def add_node(
         )
 
     if isinstance(content, str):
-        if len(content) > 3000:  # qq消息长度限制，虽然大概率也不会超过
-            for i in range(0, len(content), 2999):
-                if i + 2999 > len(content):
-                    message_segment = content[i:]
-                else:
-                    message_segment = content[i : i + 2999]
-                _add_node(message_segment)
-        else:
-            _add_node(content.strip())
+        _add_node(content.strip())
     elif isinstance(content, bytes):
         _add_node(UniMessage.image(raw=content))
     return nodes

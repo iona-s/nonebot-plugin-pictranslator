@@ -1,7 +1,7 @@
 from typing import Any
-from typing_extensions import Self
 
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from ...define import PYDANTIC_V2
 
@@ -9,8 +9,8 @@ from ...define import PYDANTIC_V2
 #     from pydantic import model_validator
 #     model_validator = model_validator(mode='before')
 # else:
-#     from pydantic import root_validator  # noqa
-#     model_validator = root_validator(pre=True)  # noqa
+#     from pydantic import root_validator
+#     model_validator = root_validator(pre=True)
 
 __all__ = ['BaseResponseModel']
 
@@ -22,29 +22,29 @@ class BaseResponseModel(BaseModel):
         else:
             allow_population_by_field_name = True
 
-    def to_dict(self, **kwargs):
+    def to_dict(self, **kwargs) -> dict:
         if PYDANTIC_V2:
             return super().model_dump(**kwargs)
-        return super().dict(**kwargs)  # noqa
+        return super().dict(**kwargs)
 
-    def to_json(self, **kwargs):
+    def to_json(self, **kwargs) -> str:
         if PYDANTIC_V2:
             if 'ensure_ascii' in kwargs:
                 kwargs.pop('ensure_ascii')
             return super().model_dump_json(**kwargs)
-        return super().json(**kwargs)  # noqa
+        return super().json(**kwargs)
 
     @classmethod
     def from_obj(cls, obj: Any) -> Self:
         if PYDANTIC_V2:
             return cls.model_validate(obj)
-        return cls.parse_obj(obj)  # noqa
+        return cls.parse_obj(obj)
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
         if PYDANTIC_V2:
             return super().model_validate_json(json_str)
-        return super().parse_raw(json_str)  # noqa
+        return super().parse_raw(json_str)
 
     # @model_validator
     # @classmethod

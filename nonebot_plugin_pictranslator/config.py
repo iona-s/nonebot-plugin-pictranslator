@@ -1,11 +1,11 @@
 from typing import Literal, Optional
 
 from nonebot import get_plugin_config
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 from .define import SUPPORTED_API, SUPPORTED_APIS
 
-__all__ = ['config', 'Config']
+__all__ = ['Config', 'config']
 
 
 class Config(BaseModel):

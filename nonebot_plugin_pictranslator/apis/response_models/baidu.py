@@ -1,10 +1,10 @@
 from typing import Optional
-from typing_extensions import Self
 
 from pydantic import Field
+from typing_extensions import Self
 
-from .base_response_model import BaseResponseModel
 from ...define import PYDANTIC_V2, REVERSE_BAIDU_LANG_CODE_MAP
+from .base_response_model import BaseResponseModel
 
 if PYDANTIC_V2:
     from pydantic import model_validator
@@ -19,10 +19,10 @@ if PYDANTIC_V2:
             return self
 
 else:
-    from pydantic import root_validator  # noqa
+    from pydantic import root_validator
 
     class ModifiedBaiduModel(BaseResponseModel):
-        @root_validator  # noqa
+        @root_validator
         def correct_lang(cls, values):  # noqa N805
             for attr in ('lang', 'source', 'target'):
                 value = values.get(attr)

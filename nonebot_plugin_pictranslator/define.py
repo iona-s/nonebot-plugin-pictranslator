@@ -1,9 +1,9 @@
-from typing import Union, Literal
+from typing import Literal, Union
 
-from pydantic import VERSION
 from langcodes import Language
+from pydantic import VERSION
 
-PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2
+PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2  # noqa: PLR2004
 
 SUPPORTED_APIS = ('tencent', 'youdao', 'baidu')
 SUPPORTED_API = Literal['tencent', 'youdao', 'baidu']

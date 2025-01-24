@@ -1,0 +1,63 @@
+line-length = 79
+show-fixes = true
+target-version = "py39"
+
+[format]
+quote-style = "single"
+
+[lint]
+allowed-confusables = ["，", "：", "？", "！"]
+logger-objects = ["nonebot.logger"]
+select = [
+    "F",      # pyflakes
+    "E", "W", # pycodestyle
+    "C90",    # mccabe
+    "I",      # isort
+    "N",      # pep8-naming
+    #    "D",      # pydocstyle
+    "UP",     # pyupgrade
+    "YTT",    # flake8-2020
+    "ANN",    # flake8-annotations
+    "ASYNC",  # flake8-async
+    "S",      # flake8-bandit
+    "BLE",   # flake8-blind-except
+    "FBT",    # flake8-boolen-trap
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",     # flake8-comprehensions
+    "DTZ",      # flake8-datetimez
+    "T10",   # flake8-debugger
+    "EM",     # flake8-errmsg
+    "EXE",   # flake8-executable
+    "FA",    # flake8-future-annotations
+    "ISC",    # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print
+    "PYI",    # flask8-pyi
+    "PT",   # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SLOT",   # flake8-slots
+    "SIM",    # flake8-simplify
+    "TC",    # flake8-type-checking
+    "ARG",   # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "PL",   # Pylint
+    "PERF",  # Perflint
+    "FURB", # refurb
+    "RUF",   # Ruff
+]
+ignore = ["ANN002", "ANN003", "ANN401", "COM812","FA100"]
+
+[lint.per-file-ignores]
+"nonebot_plugin_pictranslator/__init__.py" = ["E402"]
+
+[lint.flake8-annotations]
+suppress-dummy-args = true
+
+[lint.flake8-quotes]
+inline-quotes = "single"

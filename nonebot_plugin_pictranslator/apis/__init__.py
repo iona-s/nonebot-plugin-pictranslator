@@ -1,15 +1,15 @@
-from .base_api import TA
 from .baidu import BaiduApi
+from .base_api import TA
+from .tencent import TencentApi
 from .tianapi import TianApi
 from .youdao import YoudaoApi
-from .tencent import TencentApi
 
 __all__ = [
     'AVAILABLE_TRANSLATION_APIS',
+    'TA',
+    'TencentApi',
     'TianApi',
     'YoudaoApi',
-    'TencentApi',
-    'TA',
 ]
 
 AVAILABLE_TRANSLATION_APIS: dict[str, type[TA]] = {

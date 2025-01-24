@@ -1,30 +1,30 @@
-from time import time
+from base64 import b64decode
+from datetime import datetime, timezone
+from hashlib import sha256
+from hmac import new as hmac_new
 from io import BytesIO
 from json import dumps
 from math import floor
+from time import time
+from typing import Literal, Optional, Union
 from uuid import uuid4
-from hashlib import sha256
-from base64 import b64decode
-from hmac import new as hmac_new
-from datetime import datetime, timezone
-from typing import Union, Literal, Optional
 
+from httpx import __version__ as httpx_version
 from langcodes import Language
 from PIL import Image, ImageDraw, ImageFont
-from httpx import __version__ as httpx_version
 
 from ..config import config
 from ..define import LANGUAGE_TYPE
 from .base_api import TranslateApi
 from .response_models.tencent import (
-    OcrContent,
-    OcrResponse,
-    TextTranslationContent,
     ImageTranslationContent,
-    TextTranslationResponse,
     ImageTranslationResponse,
     LanguageDetectionContent,
     LanguageDetectionResponse,
+    OcrContent,
+    OcrResponse,
+    TextTranslationContent,
+    TextTranslationResponse,
 )
 
 __all__ = ['TencentApi']
@@ -42,7 +42,7 @@ class TencentApi(TranslateApi):
         return lang.language
 
     @staticmethod
-    def _sign(key, msg):
+    def _sign(key: bytes, msg: str) -> bytes:
         return hmac_new(key, msg.encode('utf-8'), sha256).digest()
 
     def _construct_headers(
@@ -266,8 +266,7 @@ class TencentApi(TranslateApi):
         img = Image.open(BytesIO(b64decode(base64_image)))
         for image_record in result.image_records:
             seg_translation_msgs.append(
-                f'{image_record.source_text}\n'
-                f'->{image_record.target_text}\n',
+                f'{image_record.source_text}\n->{image_record.target_text}\n',
             )
             whole_source_text += image_record.source_text
             cropped_img = img.crop(
@@ -311,14 +310,15 @@ class TencentApi(TranslateApi):
                 (0, 0),
                 image_record.target_text,
                 font=font,
-                fill='white' if luminance < 128 else 'black',
+                fill='white' if luminance < 128 else 'black',  # noqa: PLR2004
             )
             img.paste(bg, (image_record.x, image_record.y))
         img_output = BytesIO()
         img.save(img_output, format='PNG')
         msgs.extend(['整段翻译:', f'原文:\n{whole_source_text}'])
         # 腾讯图片翻译识别是每行分开的，故尝试合一起整段翻译
-        if len(whole_source_text) < 6000:
+        max_text_length = 6000
+        if len(whole_source_text) < max_text_length:
             result = await self._text_translate(
                 whole_source_text,
                 result.source,

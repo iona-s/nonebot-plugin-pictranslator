@@ -1,14 +1,14 @@
-from io import BytesIO
-from uuid import uuid4
-from hashlib import md5
-from typing import Optional
 from base64 import b64decode
+from hashlib import md5
+from io import BytesIO
+from typing import Optional
+from uuid import uuid4
 
 from langcodes import Language
 
 from ..config import config
+from ..define import BAIDU_LANG_CODE_MAP, LANGUAGE_TYPE
 from .base_api import TranslateApi
-from ..define import LANGUAGE_TYPE, BAIDU_LANG_CODE_MAP
 from .response_models.baidu import (
     ImageTranslationResponse,
     LanguageDetectionResponse,
@@ -30,14 +30,8 @@ class BaiduApi(TranslateApi):
     def sign(payload: dict, q: str, *, sign_image: bool = False) -> dict:
         salt = str(uuid4())
         extra = 'APICUIDmac' if sign_image else ''
-        sign_string = (
-            f'{config.baidu_id}'
-            f'{q}'
-            f'{salt}'
-            f'{extra}'
-            f'{config.baidu_key}'
-        )
-        sign = md5(sign_string.encode()).hexdigest()
+        sign_string = f'{config.baidu_id}{q}{salt}{extra}{config.baidu_key}'
+        sign = md5(sign_string.encode()).hexdigest()  # noqa S324
         payload.update(
             {
                 'appid': config.baidu_id,
@@ -122,7 +116,7 @@ class BaiduApi(TranslateApi):
             'paste': '1',
         }
         image_io = BytesIO(b64decode(base64_image))
-        image_md5 = md5(image_io.read()).hexdigest()
+        image_md5 = md5(image_io.read()).hexdigest()  # noqa S324
         payload = self.sign(payload, image_md5, sign_image=True)
         image = {'image': ('image.png', image_io, 'multipart/form-data')}
         return await self._handle_request(
@@ -156,6 +150,10 @@ class BaiduApi(TranslateApi):
             f'{Language.get(data.target).display_name("zh")}\n',
             '分段翻译:',
         ]
-        for section in data.content:
-            msgs.append(f'{section.source_text}\n->{section.target_text}')
+        msgs.extend(
+            [
+                f'{section.source_text}\n->{section.target_text}'
+                for section in data.content
+            ]
+        )
         return msgs, b64decode(data.render_image)

@@ -1,34 +1,34 @@
-from re import match
-from pathlib import Path
 from base64 import b64encode
+from pathlib import Path
+from re import match
 from typing import Any, Union
 
 from langcodes import Language
-from nonebot import Bot, require, on_regex, on_startswith
+from nonebot import Bot, on_regex, on_startswith, require
 
 require('nonebot_plugin_alconna')
 require('nonebot_plugin_waiter')
-from nonebot_plugin_waiter import waiter
 from nonebot.params import Event, Matcher, RegexGroup
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna.uniseg import (
-    Text,
     Image,
-    Reply,
-    UniMsg,
     Reference,
+    Reply,
+    Text,
     UniMessage,
+    UniMsg,
     image_fetch,
 )
+from nonebot_plugin_waiter import waiter
 
 from .config import Config, config
-from .utils import add_node, get_languages, extract_images, extract_from_reply
 from .translate import (
-    handle_ocr,
     handle_dictionary,
-    handle_text_translate,
     handle_image_translate,
+    handle_ocr,
+    handle_text_translate,
 )
+from .utils import add_node, extract_from_reply, extract_images, get_languages
 
 __plugin_meta__ = PluginMetadata(
     name='nonebot-plugin-pictranslator',
@@ -51,7 +51,7 @@ ocr_handler = on_startswith('/ocr', ignorecase=True)
 
 
 @dictionary_handler.handle()
-async def dictionary(match_group: tuple[Any, ...] = RegexGroup()):
+async def dictionary(match_group: tuple[Any, ...] = RegexGroup()) -> None:
     if config.tianapi_key is None:
         await dictionary_handler.finish(
             '未配置天行数据API的key，无法使用词典功能',
@@ -62,12 +62,12 @@ async def dictionary(match_group: tuple[Any, ...] = RegexGroup()):
 
 
 @translate_handler.handle()
-async def translate(
+async def translate(  # noqa: C901 PLR0912 PLR0915
     bot: Bot,
     event: Event,
     matcher: Matcher,
     match_group: tuple[Any, ...] = RegexGroup(),
-):
+) -> None:
     source_language, target_language = get_languages(
         match_group[1],
         match_group[2],
@@ -165,7 +165,7 @@ async def translate(
 
 
 @ocr_handler.handle()
-async def ocr(bot: Bot, event: Event, matcher: Matcher):
+async def ocr(bot: Bot, event: Event, matcher: Matcher) -> None:  # noqa: C901
     if not config.use_tencent:
         await ocr_handler.finish('未启用腾讯API，无法使用OCR功能')
     msg = await UniMessage.generate(event=event)

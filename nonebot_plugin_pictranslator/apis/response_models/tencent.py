@@ -5,14 +5,14 @@ from .base_response_model import BaseResponseModel
 # 分为整体的内容的解析及返回内容的Response部分
 
 __all__ = [
-    'LanguageDetectionContent',
-    'LanguageDetectionResponse',
-    'TextTranslationContent',
-    'TextTranslationResponse',
     'ImageTranslationContent',
     'ImageTranslationResponse',
+    'LanguageDetectionContent',
+    'LanguageDetectionResponse',
     'OcrContent',
     'OcrResponse',
+    'TextTranslationContent',
+    'TextTranslationResponse',
 ]
 
 
