@@ -5,13 +5,6 @@ from typing_extensions import Self
 
 from ...define import PYDANTIC_V2
 
-# if PYDANTIC_V2:
-#     from pydantic import model_validator
-#     model_validator = model_validator(mode='before')
-# else:
-#     from pydantic import root_validator
-#     model_validator = root_validator(pre=True)
-
 __all__ = ['BaseResponseModel']
 
 
@@ -45,11 +38,3 @@ class BaseResponseModel(BaseModel):
         if PYDANTIC_V2:
             return super().model_validate_json(json_str)
         return super().parse_raw(json_str)
-
-    # @model_validator
-    # @classmethod
-    # def strip_whitespace(cls, values):
-    #     for field, value in values.items():
-    #         if isinstance(value, str):
-    #             values[field] = value.strip()
-    #     return values

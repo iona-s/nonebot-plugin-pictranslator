@@ -22,7 +22,7 @@ def get_apis(
 ) -> list[type[TA]]:
     apis = [
         AVAILABLE_TRANSLATION_APIS.get(name)
-        for name in config.__getattr__(f'{api_type}_translate_apis')
+        for name in getattr(config, f'{api_type}_translate_apis')
     ]
     if language_detection and YoudaoApi in apis:
         apis.remove(YoudaoApi)
