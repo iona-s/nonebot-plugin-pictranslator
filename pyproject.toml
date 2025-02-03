@@ -28,9 +28,6 @@ dev = [
     "ruff>=0.8.4",
 ]
 
-[tool.uv]
-default-groups = []
-
 [[tool.uv.index]]
 url = "https://mirrors.aliyun.com/pypi/simple"
 default = true
