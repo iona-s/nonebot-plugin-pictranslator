@@ -4,11 +4,11 @@ require('nonebot_plugin_alconna')
 require('nonebot_plugin_waiter')
 from base64 import b64encode
 from pathlib import Path
-from re import match
+from re import IGNORECASE, match
 from typing import Any, Union
 
 from langcodes import Language
-from nonebot import Bot, on_command, on_regex
+from nonebot import Bot, on_regex
 from nonebot.params import Event, Matcher, RegexGroup
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna.uniseg import (
@@ -51,7 +51,7 @@ translate_re_pattern = (
     r'(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
 )
 translate_handler = on_regex(translate_re_pattern)
-ocr_handler = on_command(('ocr', 'Ocr', 'OCR'))
+ocr_handler = on_regex(rf'^{command_start_pattern}ocr', flags=IGNORECASE)
 
 
 @dictionary_handler.handle()
