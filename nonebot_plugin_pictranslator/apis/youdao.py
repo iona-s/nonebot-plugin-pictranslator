@@ -141,6 +141,6 @@ class YoudaoApi(TranslateApi):
             [
                 f'{section.source_text}\n->{section.target_text}'
                 for section in result.regions
-            ]
+            ],
         )
         return msgs, b64decode(result.render_image)

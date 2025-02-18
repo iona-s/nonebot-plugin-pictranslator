@@ -1,13 +1,14 @@
+from nonebot import require
+
+require('nonebot_plugin_alconna')
+require('nonebot_plugin_waiter')
 from base64 import b64encode
 from pathlib import Path
 from re import match
 from typing import Any, Union
 
 from langcodes import Language
-from nonebot import Bot, on_regex, on_startswith, require
-
-require('nonebot_plugin_alconna')
-require('nonebot_plugin_waiter')
+from nonebot import Bot, on_command, on_regex
 from nonebot.params import Event, Matcher, RegexGroup
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna.uniseg import (
@@ -43,11 +44,14 @@ __plugin_meta__ = PluginMetadata(
     ),
 )
 
-
-dictionary_handler = on_regex(r'^/(?:词典|查词)(.+)')
-translate_re_pattern = r'^/(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
+command_start_pattern = config.command_start_pattern
+dictionary_handler = on_regex(rf'^{command_start_pattern}(?:词典|查词)(.+)')
+translate_re_pattern = (
+    rf'^{command_start_pattern}'
+    r'(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
+)
 translate_handler = on_regex(translate_re_pattern)
-ocr_handler = on_startswith('/ocr', ignorecase=True)
+ocr_handler = on_command('ocr')
 
 
 @dictionary_handler.handle()

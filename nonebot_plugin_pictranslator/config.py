@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from nonebot import get_plugin_config
+from nonebot import get_driver, get_plugin_config
 from pydantic import BaseModel, Field
 
 from .define import SUPPORTED_API, SUPPORTED_APIS
@@ -9,6 +9,11 @@ __all__ = ['Config', 'config']
 
 
 class Config(BaseModel):
+    command_start: set[str] = Field(
+        default='翻译',
+        description='配置命令的起始字符',
+    )
+
     text_translate_apis: list[SUPPORTED_API] = Field(
         default=None,
         description='文本翻译API的优先级，从高到低，默认以腾讯->百度->有道的顺序调用',
@@ -84,7 +89,9 @@ class Config(BaseModel):
         description='是否启用天行数据API，填写了上一项则默认启用',
     )
 
-    def initialize(self) -> None:
+    def initialize(self) -> None:  # noqa C901
+        if self.command_start is None:
+            self.command_start = get_driver().config.command_start
         if self.use_tianapi is None and self.tianapi_key:
             self.use_tianapi = True
         for name in SUPPORTED_APIS:
@@ -105,6 +112,20 @@ class Config(BaseModel):
             for name in SUPPORTED_APIS:
                 if getattr(self, f'use_{name}'):
                     self.image_translate_apis.append(name)
+
+    @property
+    def command_start_pattern(self) -> str:
+        if not self.command_start or self.command_start == {''}:
+            return ''
+        command_start = list(config.command_start)
+        if '' in command_start:
+            command_start.remove('')
+        if len(command_start) == 1:
+            return command_start[0]
+        pattern = '(?:' + '|'.join(command_start) + ')'
+        if '' in self.command_start:
+            pattern += '?'
+        return pattern
 
 
 config = get_plugin_config(Config)

@@ -126,6 +126,7 @@ _✨ NoneBot 翻译插件 ✨_
 
 |         配置项          |   必填   |              默认值               |                 可填值                 |                            说明                            |
 |:--------------------:|:------:|:------------------------------:|:-----------------------------------:|:--------------------------------------------------------:|
+|    COMMAND_START     |   否    |  同`nonebot`自身的`COMMAND_START`  |             Array[str]              |             配置命令的起始字符，不配置默认使用`nonebot`同名配置项              |
 | TEXT_TRANSLATE_APIS  |   否    | ['tencent', 'baidu', 'youdao'] | Array['tencent', 'baidu', 'youdao'] |                 启用哪些API，并以什么优先级调用进行文本翻译                  |
 | IMAGE_TRANSLATE_APIS |   否    | ['baidu', 'youdao', 'tencent'] | Array['tencent', 'youdao', 'baidu'] |                       图片翻译API选择，同上                       |
 | TEXT_TRANSLATE_MODE  |   否    |             'auto'             |            'auto', 'all'            |      文本翻译模式，`auto`代表以优先级调用第一个可用API，`all`代表调用全部可用api      |

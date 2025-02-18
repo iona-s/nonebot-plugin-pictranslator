@@ -154,6 +154,6 @@ class BaiduApi(TranslateApi):
             [
                 f'{section.source_text}\n->{section.target_text}'
                 for section in data.content
-            ]
+            ],
         )
         return msgs, b64decode(data.render_image)

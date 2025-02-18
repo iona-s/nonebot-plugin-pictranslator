@@ -28,7 +28,7 @@ class BaseResponseModel(BaseModel):
         return super().json(**kwargs)
 
     @classmethod
-    def from_obj(cls, obj: Any) -> Self:
+    def from_obj(cls, obj: Any) -> Self:  # noqa ANN401
         if PYDANTIC_V2:
             return cls.model_validate(obj)
         return cls.parse_obj(obj)

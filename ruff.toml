@@ -14,44 +14,49 @@ select = [
     "C90",    # mccabe
     "I",      # isort
     "N",      # pep8-naming
-    #    "D",      # pydocstyle
+#    "D",      # pydocstyle
     "UP",     # pyupgrade
     "YTT",    # flake8-2020
     "ANN",    # flake8-annotations
     "ASYNC",  # flake8-async
     "S",      # flake8-bandit
-    "BLE",   # flake8-blind-except
+    "BLE",    # flake8-blind-except
     "FBT",    # flake8-boolen-trap
     "B",      # flake8-bugbear
     "A",      # flake8-builtins
-    "COM",   # flake8-commas
+    "COM",    # flake8-commas
     "C4",     # flake8-comprehensions
-    "DTZ",      # flake8-datetimez
-    "T10",   # flake8-debugger
+    "DTZ",    # flake8-datetimez
+    "T10",    # flake8-debugger
     "EM",     # flake8-errmsg
-    "EXE",   # flake8-executable
-    "FA",    # flake8-future-annotations
+    "EXE",    # flake8-executable
+    "FA",     # flake8-future-annotations
     "ISC",    # flake8-implicit-str-concat
-    "ICN",   # flake8-import-conventions
+    "ICN",    # flake8-import-conventions
     "PIE",    # flake8-pie
     "T20",    # flake8-print
     "PYI",    # flask8-pyi
-    "PT",   # flake8-pytest-style
+    "PT",     # flake8-pytest-style
     "Q",      # flake8-quotes
     "RSE",    # flake8-raise
     "RET",    # flake8-return
     "SLF",    # flake8-self
     "SLOT",   # flake8-slots
     "SIM",    # flake8-simplify
-    "TC",    # flake8-type-checking
-    "ARG",   # flake8-unused-arguments
+    "TC",     # flake8-type-checking
+    "ARG",    # flake8-unused-arguments
     "PTH",    # flake8-use-pathlib
-    "PL",   # Pylint
-    "PERF",  # Perflint
-    "FURB", # refurb
-    "RUF",   # Ruff
+    "PL",     # Pylint
+    "PERF",   # Perflint
+    "FURB",   # refurb
+    "RUF",    # Ruff
 ]
-ignore = ["ANN002", "ANN003", "ANN401", "COM812","FA100"]
+ignore = [
+    "COM812",  # comflicts with formatter
+    "ANN002",  # annotation for *arg
+    "ANN003",  # annotation for **kwarg
+    "FA100",
+]
 
 [lint.per-file-ignores]
 "nonebot_plugin_pictranslator/__init__.py" = ["E402"]

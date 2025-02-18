@@ -18,7 +18,9 @@ AVAILABLE_TRANSLATION_APIS: dict[SUPPORTED_API, type[TA]] = {
 
 
 def get_apis(
-    api_type: Literal['image', 'text'], *, language_detection: bool = False
+    api_type: Literal['image', 'text'],
+    *,
+    language_detection: bool = False,
 ) -> list[type[TA]]:
     apis = [
         AVAILABLE_TRANSLATION_APIS.get(name)

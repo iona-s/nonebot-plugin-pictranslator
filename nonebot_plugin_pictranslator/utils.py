@@ -1,8 +1,9 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from langcodes import Language, LanguageTagError
 from nonebot import get_driver, logger
 from nonebot.params import Message
+from nonebot_plugin_alconna import Segment
 from nonebot_plugin_alconna.uniseg import (
     CustomNode,
     Image,
@@ -79,7 +80,7 @@ def add_node(
     nickname = global_config.nickname
     nickname = next(iter(nickname)) if nickname else '翻译姬'
 
-    def _add_node(node_content: Any) -> None:
+    def _add_node(node_content: Union[str, UniMessage, list[Segment]]) -> None:
         nodes.append(
             CustomNode(
                 uid=bot_id,
