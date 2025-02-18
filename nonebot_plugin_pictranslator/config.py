@@ -121,10 +121,10 @@ class Config(BaseModel):
         ):
             return ''
         command_start = list(self.pictranslate_command_start)
-        if '' in command_start:
-            command_start.remove('')
         if len(command_start) == 1:
             return command_start[0]
+        if '' in command_start:
+            command_start.remove('')
         pattern = '(?:' + '|'.join(command_start) + ')'
         if '' in self.pictranslate_command_start:
             pattern += '?'
