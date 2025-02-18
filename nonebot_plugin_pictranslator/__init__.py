@@ -51,7 +51,7 @@ translate_re_pattern = (
     r'(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
 )
 translate_handler = on_regex(translate_re_pattern)
-ocr_handler = on_command('ocr')
+ocr_handler = on_command(('ocr', 'Ocr', 'OCR'))
 
 
 @dictionary_handler.handle()

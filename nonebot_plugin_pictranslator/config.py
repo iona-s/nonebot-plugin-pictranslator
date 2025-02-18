@@ -9,8 +9,8 @@ __all__ = ['Config', 'config']
 
 
 class Config(BaseModel):
-    command_start: set[str] = Field(
-        default='翻译',
+    pictranslate_command_start: set[str] = Field(
+        default=None,
         description='配置命令的起始字符',
     )
 
@@ -90,8 +90,8 @@ class Config(BaseModel):
     )
 
     def initialize(self) -> None:  # noqa C901
-        if self.command_start is None:
-            self.command_start = get_driver().config.command_start
+        if self.pictranslate_command_start is None:
+            self.pictranslate_command_start = get_driver().config.command_start
         if self.use_tianapi is None and self.tianapi_key:
             self.use_tianapi = True
         for name in SUPPORTED_APIS:
@@ -115,15 +115,18 @@ class Config(BaseModel):
 
     @property
     def command_start_pattern(self) -> str:
-        if not self.command_start or self.command_start == {''}:
+        if (
+            not self.pictranslate_command_start
+            or self.pictranslate_command_start == {''}
+        ):
             return ''
-        command_start = list(config.command_start)
+        command_start = list(self.pictranslate_command_start)
         if '' in command_start:
             command_start.remove('')
         if len(command_start) == 1:
             return command_start[0]
         pattern = '(?:' + '|'.join(command_start) + ')'
-        if '' in self.command_start:
+        if '' in self.pictranslate_command_start:
             pattern += '?'
         return pattern
 
