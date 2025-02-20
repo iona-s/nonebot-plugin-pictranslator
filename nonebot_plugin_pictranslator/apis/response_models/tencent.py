@@ -1,4 +1,5 @@
 from pydantic import Field
+from typing_extensions import Self
 
 from .base_response_model import BaseResponseModel
 
@@ -15,8 +16,36 @@ __all__ = [
     'TextTranslationResponse',
 ]
 
+from ...define import PYDANTIC_V2
 
-class LanguageDetectionContent(BaseResponseModel):
+# 暂时只注意到日语有问题
+# 分别是语种识别的jp和ocr的jap
+if PYDANTIC_V2:
+    from pydantic import model_validator
+
+    class FixTencentLangCodeModel(BaseResponseModel):
+        @model_validator(mode='after')
+        def correct_lang(self) -> Self:
+            for attr in ('lang', 'source', 'target'):
+                value = getattr(self, attr, None)
+                if value in {'jp', 'jap'}:
+                    setattr(self, attr, 'ja')
+            return self
+
+else:
+    from pydantic import root_validator
+
+    class FixTencentLangCodeModel(BaseResponseModel):
+        @root_validator
+        def correct_lang(cls, values):  # noqa N805
+            for attr in ('lang', 'source', 'target'):
+                value = values.get(attr)
+                if value in {'jp', 'jap'}:
+                    values[attr] = 'ja'
+            return values
+
+
+class LanguageDetectionContent(FixTencentLangCodeModel):
     lang: str = Field(..., alias='Lang', description='语言代码')
 
 
@@ -83,13 +112,13 @@ class TextDetectionContent(BaseResponseModel):
     confidence: int = Field(..., alias='Confidence', description='置信度')
 
 
-class OcrContent(BaseResponseModel):
+class OcrContent(FixTencentLangCodeModel):
     text_detections: list[TextDetectionContent] = Field(
         ...,
         alias='TextDetections',
         description='文本检测',
     )
-    language: str = Field(..., alias='Language', description='语言')
+    lang: str = Field(..., alias='Language', description='语言')
 
 
 class OcrResponse(BaseResponseModel):

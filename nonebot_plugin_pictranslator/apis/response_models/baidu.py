@@ -9,7 +9,7 @@ from .base_response_model import BaseResponseModel
 if PYDANTIC_V2:
     from pydantic import model_validator
 
-    class ModifiedBaiduModel(BaseResponseModel):
+    class FixBaiduLangCodeModel(BaseResponseModel):
         @model_validator(mode='after')
         def correct_lang(self) -> Self:
             for attr in ('lang', 'source', 'target'):
@@ -21,7 +21,7 @@ if PYDANTIC_V2:
 else:
     from pydantic import root_validator
 
-    class ModifiedBaiduModel(BaseResponseModel):
+    class FixBaiduLangCodeModel(BaseResponseModel):
         @root_validator
         def correct_lang(cls, values):  # noqa N805
             for attr in ('lang', 'source', 'target'):
@@ -31,7 +31,7 @@ else:
             return values
 
 
-class LanguageDetectionData(ModifiedBaiduModel):
+class LanguageDetectionData(FixBaiduLangCodeModel):
     lang: str = Field(..., alias='src', description='语言代码')
 
 
@@ -46,7 +46,7 @@ class LanguageTranslationData(BaseResponseModel):
     target_text: str = Field(..., alias='dst', description='目标文本')
 
 
-class LanguageTranslationResponse(ModifiedBaiduModel):
+class LanguageTranslationResponse(FixBaiduLangCodeModel):
     error_code: Optional[str] = Field(default=None, description='错误码')
     error_msg: Optional[str] = Field(default=None, description='错误信息')
     source: str = Field(..., alias='from', description='源语言')
@@ -64,7 +64,7 @@ class ImageTranslationSection(BaseResponseModel):
     # 其余参数用不上
 
 
-class ImageTranslationData(ModifiedBaiduModel):
+class ImageTranslationData(FixBaiduLangCodeModel):
     source: str = Field(..., alias='from', description='源语言')
     target: str = Field(..., alias='to', description='目标语言')
     source_text: str = Field(

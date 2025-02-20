@@ -172,7 +172,7 @@ class TencentApi(TranslateApi):
         result = await self._language_detection(text)
         if result is None:
             return None
-        return Language.get('ja' if result.lang == 'jp' else result.lang)
+        return Language.get(result.lang)
 
     async def _text_translate(
         self,
@@ -361,7 +361,7 @@ class TencentApi(TranslateApi):
         result = await self._ocr(image)
         if result is None:
             return ['OCR失败']
-        msgs = [f'语言: {Language.get(result.language).display_name("zh")}']
+        msgs = [f'语言: {Language.get(result.lang).display_name("zh")}']
         seg_msgs = ['分段:']
         whole_text = ''
         for text in result.text_detections:
