@@ -7,7 +7,7 @@ ci:
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.4
+    rev: v0.9.9
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -23,7 +23,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.5.26
+    rev: 0.6.3
     hooks:
       - id: uv-lock
       - id: uv-export
