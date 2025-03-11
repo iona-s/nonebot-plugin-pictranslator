@@ -246,21 +246,21 @@ class TencentApi(TranslateApi):
         base64_image: bytes,
         source_language: LANGUAGE_TYPE,
         target_language: Language,
-    ) -> tuple[list[str], Optional[bytes]]:
+    ) -> list[Union[str, bytes]]:
         result = await self._image_translate(
             base64_image,
             self._get_language(source_language),
             self._get_language(target_language),
         )
         if result is None:
-            return ['腾讯翻译出错'], None
+            return ['腾讯翻译出错']
         source_language = Language.get(result.source)
         target_language = Language.get(result.target)
         msgs = [
             f'腾讯翻译:\n{source_language.language_name("zh")}->'
             f'{target_language.language_name("zh")}:\n',
         ]
-        seg_translation_msgs = ['分块翻译:']
+        seg_translation_msgs = ['逐行翻译:']
         # 腾讯是分行识别的，故增加一个整段文本
         whole_source_text = ''
         img = Image.open(BytesIO(b64decode(base64_image)))
@@ -315,10 +315,11 @@ class TencentApi(TranslateApi):
             img.paste(bg, (image_record.x, image_record.y))
         img_output = BytesIO()
         img.save(img_output, format='PNG')
-        msgs.extend(['整段翻译:', f'原文:\n{whole_source_text}'])
+        msgs.append(img_output.getvalue())
         # 腾讯图片翻译识别是每行分开的，故尝试合一起整段翻译
         max_text_length = 6000
         if len(whole_source_text) < max_text_length:
+            msgs.extend(['整段翻译:', f'{whole_source_text}'])
             result = await self._text_translate(
                 whole_source_text,
                 result.source,
@@ -331,7 +332,7 @@ class TencentApi(TranslateApi):
         else:
             msgs.append('文本过长，不提供整段翻译')
         msgs.extend(seg_translation_msgs)
-        return msgs, img_output.getvalue()
+        return msgs
 
     async def _ocr(self, image: Union[str, bytes]) -> Optional[OcrContent]:
         if isinstance(image, str):

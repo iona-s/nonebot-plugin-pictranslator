@@ -1,7 +1,7 @@
 from base64 import b64decode
 from hashlib import sha256
 from time import time
-from typing import Optional
+from typing import Optional, Union
 from uuid import uuid4
 
 from langcodes import Language
@@ -122,20 +122,23 @@ class YoudaoApi(TranslateApi):
         base64_image: bytes,
         source_language: LANGUAGE_TYPE,
         target_language: Language,
-    ) -> tuple[list[str], Optional[bytes]]:
+    ) -> list[Union[str, bytes]]:
         result = await self._image_translate(
             base64_image,
             self._get_language(source_language),
             self._get_language(target_language),
         )
         if result is None:
-            return ['有道翻译出错'], None
+            return ['有道翻译出错']
+        msgs = []
         source_language = Language.get(result.source)
         target_language = Language.get(result.target)
         msgs = [
-            f'有道翻译:\n{source_language.display_name("zh")}->'
+            f'有道翻译:\n'
+            f'{source_language.display_name("zh")}->'
             f'{target_language.display_name("zh")}',
-            '分翻译:',
+            b64decode(result.render_image),
+            '分段翻译:',
         ]
         msgs.extend(
             [
@@ -143,4 +146,4 @@ class YoudaoApi(TranslateApi):
                 for section in result.regions
             ],
         )
-        return msgs, b64decode(result.render_image)
+        return msgs

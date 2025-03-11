@@ -141,27 +141,25 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
                 await image_fetch(event, bot, matcher.state, image),
             ),
         )
+    notice_msg = '翻译中...'
     if target_language == 'auto':
         if source_language == 'auto' or source_language.language != 'zh':
             target_language = Language.make('zh')
+            notice_msg += '\n图片翻译无法自动选择目标语言，默认翻译为中文。'
         else:
             target_language = Language.make('en')
-        await translate_handler.send(
-            '图片翻译无法自动选择目标语言，默认翻译为中文。\n'
-            '可使用[图片翻译<语言>]来指定',
-        )
-    await translate_handler.send('翻译中...')
+            notice_msg += '\n未指定目标语言，默认翻译为英文'
+        notice_msg += '\n可使用[图片翻译<语言>]来指定'
+    await translate_handler.send(notice_msg)
     for base64_image in base64_images:
         results = await handle_image_translate(
             base64_image,
             source_language,
             target_language,
         )
-        for msgs, image in results:
+        for result_per_api in results:
             nodes = []
-            if image is not None:
-                add_node(nodes, image, bot.self_id)
-            for msg in msgs:
+            for msg in result_per_api:
                 add_node(nodes, msg, bot.self_id)
             await translate_handler.send(
                 await UniMessage(Reference(nodes=nodes)).export(),

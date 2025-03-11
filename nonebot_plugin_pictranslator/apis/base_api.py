@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, Union
 
 from httpx import AsyncClient, Response
 from langcodes import Language
@@ -83,5 +83,5 @@ class TranslateApi(BaseApi, ABC):
         base64_image: bytes,
         source_language: LANGUAGE_TYPE,
         target_language: Language,
-    ) -> tuple[list[str], Optional[bytes]]:
+    ) -> list[Union[str, bytes]]:
         pass

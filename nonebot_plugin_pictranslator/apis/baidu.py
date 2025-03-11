@@ -1,7 +1,7 @@
 from base64 import b64decode
 from hashlib import md5
 from io import BytesIO
-from typing import Optional
+from typing import Optional, Union
 from uuid import uuid4
 
 from langcodes import Language
@@ -14,6 +14,8 @@ from .response_models.baidu import (
     LanguageDetectionResponse,
     LanguageTranslationResponse,
 )
+
+# TODO 添加ocr接口
 
 
 class BaiduApi(TranslateApi):
@@ -132,14 +134,14 @@ class BaiduApi(TranslateApi):
         base64_image: bytes,
         source_language: LANGUAGE_TYPE,
         target_language: Language,
-    ) -> tuple[list[str], Optional[bytes]]:
+    ) -> list[Union[str, bytes]]:
         result = await self._image_translate(
             base64_image,
             self._get_language(source_language),
             self._get_language(target_language),
         )
         if result is None:
-            return ['百度翻译出错'], None
+            return ['百度翻译出错']
         data = result.data
         if data.source == 'auto':
             source_name = '自动检测'
@@ -148,6 +150,7 @@ class BaiduApi(TranslateApi):
         msgs = [
             f'百度翻译:\n{source_name}->'
             f'{Language.get(data.target).display_name("zh")}\n',
+            b64decode(data.render_image),
             '分段翻译:',
         ]
         msgs.extend(
@@ -156,4 +159,4 @@ class BaiduApi(TranslateApi):
                 for section in data.content
             ],
         )
-        return msgs, b64decode(data.render_image)
+        return msgs

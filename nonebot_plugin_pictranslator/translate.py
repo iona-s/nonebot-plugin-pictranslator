@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 
 from httpx import AsyncClient
 from langcodes import Language
@@ -92,23 +92,24 @@ async def handle_image_translate(
     base64_image: bytes,
     source_language: LANGUAGE_TYPE,
     target_language: Language,
-) -> list[tuple[list[str], Optional[bytes]]]:
+) -> list[list[Union[str, bytes]]]:
     results = []
     apis = get_apis('image')
     if not apis:
-        return [(['无可用翻译API'], None)]
+        return [['无可用翻译API']]
     if config.image_translate_mode == 'auto':
         apis = [apis.pop(0)]
         # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
     async with AsyncClient() as client:
         for api_class in apis:
             api: TA = api_class(client)
-            msgs, image = await api.image_translate(
-                base64_image,
-                source_language,
-                target_language,
+            results.append(
+                await api.image_translate(
+                    base64_image,
+                    source_language,
+                    target_language,
+                )
             )
-            results.append((msgs, image))
     return results
 
 
