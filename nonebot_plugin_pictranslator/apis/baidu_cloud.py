@@ -47,15 +47,20 @@ class BaiduCloudApi(TranslateApi):
         resp = await self._request(url, 'POST', params=params, data=payload)
         return resp.json()['access_token']
 
-    async def _ocr(self, base64_image: bytes) -> Optional[OcrResponse]:
-        payload = {
-            'image': base64_image.decode('utf8'),
-            'paragraph': True,
-            # 下面的未使用
-            # 'language_type': 'auto_detect',
-            # 'detect_direction': False,
-            # 'multidirectional_recognize': False,
-        }
+    async def _ocr(self, image: Union[str, bytes]) -> Optional[OcrResponse]:
+        if isinstance(image, str):
+            payload = {'url': image}
+        else:
+            payload = {'image': image.decode('utf-8')}
+        payload.update(
+            {
+                'paragraph': True,
+                # 下面的未使用
+                # 'language_type': 'auto_detect',
+                # 'detect_direction': False,
+                # 'multidirectional_recognize': False,
+            }
+        )
         params = {
             'access_token': await self._get_access_token(),
         }
@@ -67,8 +72,8 @@ class BaiduCloudApi(TranslateApi):
             data=payload,
         )
 
-    async def ocr(self, base64_image: bytes) -> list[str]:
-        result = await self._ocr(base64_image)
+    async def ocr(self, image: Union[str, bytes]) -> list[str]:
+        result = await self._ocr(image)
         if not result:
             return ['OCR失败']
         content = ['百度智能云OCR结果']

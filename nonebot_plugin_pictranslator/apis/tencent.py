@@ -366,7 +366,7 @@ class TencentApi(TranslateApi):
             f'腾讯OCR结果\n'
             f'语言: {Language.get(result.lang).display_name("zh")}'
         ]
-        seg_msgs = ['分段:']
+        seg_msgs = ['分行:']
         whole_text = ''
         for text in result.text_detections:
             seg_msgs.append(text.text)

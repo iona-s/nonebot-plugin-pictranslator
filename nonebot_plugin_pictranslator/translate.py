@@ -75,7 +75,7 @@ async def handle_text_translate(
                     if source_language.language != 'zh'
                     else Language.make('en')
                 )
-        if config.text_translate_mode == 'single':
+        if config.text_translate_mode == 'auto':
             apis = [apis.pop(0)]
         elif config.text_translate_mode == 'random':
             apis = [choice(apis)]  # noqa S311
@@ -100,7 +100,7 @@ async def handle_image_translate(
     apis = get_apis('image_translate')
     if not apis:
         return [['无可用翻译API']]
-    if config.image_translate_mode == 'single':
+    if config.image_translate_mode == 'auto':
         apis = [apis.pop(0)]
     elif config.image_translate_mode == 'random':
         apis = [choice(apis)]  # noqa S311
@@ -123,7 +123,7 @@ async def handle_ocr(
     apis = get_apis('ocr')
     if not apis:
         return [['无可用OCRAPI']]
-    if config.ocr_mode == 'single':
+    if config.ocr_mode == 'auto':
         apis = [apis.pop(0)]
     elif config.ocr_mode == 'random':
         apis = [choice(apis)]  # noqa S311
