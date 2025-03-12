@@ -142,17 +142,22 @@ _✨ NoneBot 翻译插件 ✨_
 |        USE_TENCENT         |   否    |               /                |                Bool                 |                     是否启用腾讯API，填写了上两项则默认启用                      |
 |     TENCENT_PROJECT_ID     |   否    |               0                |                 Int                 |                        腾讯API的project_id                        |
 |     TENCENT_API_REGION     |   否    |          ap-shanghai           |               String                |                         腾讯API的region参数                         |
-|          有道API相关           |   /    |               /                |                  /                  |          详见[有道文档](https://fanyi.youdao.com/openapi/)           |
-|         YOUDAO_ID          | 若使用则必填 |               无                |               String                |                       有道翻译API的secret_id                        |
-|         YOUDAO_KEY         | 若使用则必填 |               无                |               String                |                       有道翻译API的secret_key                       |
+|          有道API相关           |   /    |               /                |                  /                  |          详见[有道文档](https://ai.youdao.com/doc.s#guide)           |
+|         YOUDAO_ID          | 若使用则必填 |               无                |               String                |                          有道翻译API的应用ID                          |
+|         YOUDAO_KEY         | 若使用则必填 |               无                |               String                |                          有道翻译API的应用密钥                          |
 |         USE_YOUDAO         |   否    |               /                |                Bool                 |                    是否启用有道翻译API，填写了上两项则默认启用                     |
 |          百度API相关           |   /    |               /                |                  /                  |          详见[百度文档](https://fanyi-api.baidu.com/doc/11)          |
-|          BAIDU_ID          | 若使用则必填 |               无                |               String                |                       百度翻译API的secret_id                        |
-|         BAIDU_KEY          | 若使用则必填 |               无                |               String                |                       百度翻译API的secret_key                       |
+|          BAIDU_ID          | 若使用则必填 |               无                |               String                |                        百度翻译开放平台的APP ID                         |
+|         BAIDU_KEY          | 若使用则必填 |               无                |               String                |                          百度翻译开放平台的密钥                           |
 |         USE_BAIDU          |   否    |               /                |                Bool                 |                    是否启用百度翻译API，填写了上两项则默认启用                     |
+|          百度API相关           |   /    |               /                |                  /                  |  详见[百度智能云文档](https://ai.baidu.com/ai-doc/REFERENCE/Tktjypljq)  |
+|       BAIDU_CLOUD_ID       | 若使用则必填 |               无                |               String                |                        百度智能云的应用API KEY                         |
+|      BAIDU_CLOUD_KEY       | 若使用则必填 |               无                |               String                |                       百度智能云的应用Secret KEY                       |
+|      USE_BAIDU_CLOUD       |   否    |               /                |                Bool                 |                    是否启用百度智能云API，填写了上两项则默认启用                    |
 |        TIANAPI_KEY         | 若使用则必填 |               无                |               String                |                      天聚数行APIkey，用于中英词典查询                       |
 
 
 ## 📜 TODOs
-- [ ] 完成百度智能云相关api
+- [ ] 完成百度智能云翻译相关api
+- [ ] ocr实现指定目标语言
 - [ ] 实现`auto`模式下一个接口资源使用完后自动切换到下一个
