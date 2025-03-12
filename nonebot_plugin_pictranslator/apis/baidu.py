@@ -15,8 +15,6 @@ from .response_models.baidu import (
     LanguageTranslationResponse,
 )
 
-# TODO 添加ocr接口
-
 
 class BaiduApi(TranslateApi):
     @staticmethod

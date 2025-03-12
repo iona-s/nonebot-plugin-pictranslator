@@ -362,12 +362,15 @@ class TencentApi(TranslateApi):
         result = await self._ocr(image)
         if result is None:
             return ['OCR失败']
-        msgs = [f'语言: {Language.get(result.lang).display_name("zh")}']
+        msgs = [
+            f'腾讯OCR结果\n'
+            f'语言: {Language.get(result.lang).display_name("zh")}'
+        ]
         seg_msgs = ['分段:']
         whole_text = ''
         for text in result.text_detections:
             seg_msgs.append(text.text)
             whole_text += text.text
-        msgs.extend(seg_msgs)
         msgs.extend(['整段:', whole_text])
+        msgs.extend(seg_msgs)
         return msgs

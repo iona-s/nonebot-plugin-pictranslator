@@ -1,3 +1,4 @@
+from random import choice
 from typing import Union
 
 from httpx import AsyncClient
@@ -6,7 +7,6 @@ from nonebot import logger
 
 from .apis import (
     TA,
-    TencentApi,
     TianApi,
     get_apis,
 )
@@ -38,17 +38,19 @@ async def handle_text_translate(
     target_language: LANGUAGE_TYPE,
 ) -> list[str]:
     results = []
-    apis = get_apis('text')
+    apis = get_apis('text_translate')
     if not apis:
         return ['无可用翻译API']
     async with AsyncClient() as client:
         if target_language == 'auto':
             if source_language == 'auto':
-                detection_api = get_apis('text', language_detection=True)
+                detection_api = get_apis(
+                    'text_translate', language_detection=True
+                )
                 if not detection_api:
                     results.append(
                         '有道不提供语言检测API，故默认翻译为中文。'
-                        '可使用[/译<语言>]来指定',
+                        '可使用[译<语言>]来指定',
                     )
                     target_language = Language.make('zh')
                 else:
@@ -73,9 +75,10 @@ async def handle_text_translate(
                     if source_language.language != 'zh'
                     else Language.make('en')
                 )
-        if config.text_translate_mode == 'auto':
+        if config.text_translate_mode == 'single':
             apis = [apis.pop(0)]
-            # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
+        elif config.text_translate_mode == 'random':
+            apis = [choice(apis)]  # noqa S311
         for api_class in apis:
             api: TA = api_class(client)
             results.append(
@@ -94,12 +97,13 @@ async def handle_image_translate(
     target_language: Language,
 ) -> list[list[Union[str, bytes]]]:
     results = []
-    apis = get_apis('image')
+    apis = get_apis('image_translate')
     if not apis:
         return [['无可用翻译API']]
-    if config.image_translate_mode == 'auto':
+    if config.image_translate_mode == 'single':
         apis = [apis.pop(0)]
-        # TODO 调用次数用完自动使用下一个可用，但感觉不太用的上
+    elif config.image_translate_mode == 'random':
+        apis = [choice(apis)]  # noqa S311
     async with AsyncClient() as client:
         for api_class in apis:
             api: TA = api_class(client)
@@ -115,7 +119,17 @@ async def handle_image_translate(
 
 async def handle_ocr(
     image: Union[str, bytes],
-) -> list[str]:
+) -> list[list[str]]:
+    apis = get_apis('ocr')
+    if not apis:
+        return [['无可用OCRAPI']]
+    if config.ocr_mode == 'single':
+        apis = [apis.pop(0)]
+    elif config.ocr_mode == 'random':
+        apis = [choice(apis)]  # noqa S311
+    result = []
     async with AsyncClient() as client:
-        api = TencentApi(client)
-        return await api.ocr(image)
+        for api_class in apis:
+            api: TA = api_class(client)
+            result.append(await api.ocr(image))
+    return result

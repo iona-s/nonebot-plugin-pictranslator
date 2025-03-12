@@ -3,7 +3,15 @@ from typing import Literal, Optional
 from nonebot import get_driver, get_plugin_config
 from pydantic import BaseModel, Field
 
-from .define import SUPPORTED_API, SUPPORTED_APIS
+from .define import (
+    ALL_APIS,
+    SUPPORTED_IMAGE_TRANSLATE_API,
+    SUPPORTED_IMAGE_TRANSLATE_APIS,
+    SUPPORTED_OCR_API,
+    SUPPORTED_OCR_APIS,
+    SUPPORTED_TEXT_TRANSLATE_API,
+    SUPPORTED_TEXT_TRANSLATE_APIS,
+)
 
 __all__ = ['Config', 'config']
 
@@ -14,21 +22,29 @@ class Config(BaseModel):
         description='配置命令的起始字符',
     )
 
-    text_translate_apis: list[SUPPORTED_API] = Field(
+    text_translate_apis: list[SUPPORTED_TEXT_TRANSLATE_API] = Field(
         default=None,
         description='文本翻译API的优先级，从高到低，默认以腾讯->百度->有道的顺序调用',
     )
-    image_translate_apis: list[SUPPORTED_API] = Field(
+    image_translate_apis: list[SUPPORTED_IMAGE_TRANSLATE_API] = Field(
         default=None,
         description='图片翻译API的优先级，从高到低，默认以百度->有道->腾讯的顺序调用',
     )
-    text_translate_mode: Literal['auto', 'all'] = Field(
-        default='auto',
-        description='文本翻译模式，auto为自动选择一个api进行翻译，all为使用全部api进行翻译',
+    ocr_apis: list[SUPPORTED_OCR_API] = Field(
+        default=None,
+        description='ocr的优先级，从高到低，默认以百度智能云->腾讯的顺序调用',
     )
-    image_translate_mode: Literal['auto', 'all'] = Field(
+    # auto为选择优先级最高的api，random为随机选择一个，all为使用全部api'
+    text_translate_mode: Literal['auto', 'random', 'all'] = Field(
         default='auto',
-        description='图片翻译模式，auto为自动选择一个api进行翻译，all为使用全部api进行翻译',
+        description='文本翻译模式',
+    )
+    image_translate_mode: Literal['auto', 'random', 'all'] = Field(
+        default='auto',
+        description='图片翻译模式',
+    )
+    ocr_mode: Literal['auto', 'random', 'all'] = Field(
+        default='auto', description='ocr模式'
     )
 
     tencent_id: Optional[str] = Field(
@@ -77,7 +93,21 @@ class Config(BaseModel):
     )
     use_baidu: Optional[bool] = Field(
         default=None,
-        description='是否启用百度API，填写了上两项则默认启用',
+        description='是否启用百度开放翻译平台API，填写了上两项则默认启用',
+    )
+
+    baidu_cloud_id: Optional[str] = Field(
+        default=None,
+        description='百度智能云API的应用APIKEY',
+        coerce_numbers_to_str=True,
+    )
+    baidu_cloud_key: Optional[str] = Field(
+        default=None,
+        description='百度智能云API的应用Secret KEY',
+    )
+    use_baidu_cloud: Optional[bool] = Field(
+        default=None,
+        description='是否启用百度智能云API，填写了上两项则默认启用',
     )
 
     tianapi_key: Optional[str] = Field(
@@ -94,8 +124,7 @@ class Config(BaseModel):
             self.pictranslate_command_start = get_driver().config.command_start
         if self.use_tianapi is None and self.tianapi_key:
             self.use_tianapi = True
-        for name in SUPPORTED_APIS:
-            name: SUPPORTED_API
+        for name in ALL_APIS:
             if (
                 getattr(self, f'use_{name}') is None
                 and getattr(self, f'{name}_id')
@@ -104,14 +133,20 @@ class Config(BaseModel):
                 setattr(self, f'use_{name}', True)
         if self.text_translate_apis is None:
             self.text_translate_apis = []
-            for name in SUPPORTED_APIS:
+            for name in SUPPORTED_TEXT_TRANSLATE_APIS:
+                # TODO baidu_cloud WIP
                 if getattr(self, f'use_{name}'):
                     self.text_translate_apis.append(name)
         if self.image_translate_apis is None:
             self.image_translate_apis = []
-            for name in SUPPORTED_APIS:
+            for name in SUPPORTED_IMAGE_TRANSLATE_APIS:
                 if getattr(self, f'use_{name}'):
                     self.image_translate_apis.append(name)
+        if self.ocr_apis is None:
+            self.ocr_apis = []
+            for name in SUPPORTED_OCR_APIS:
+                if getattr(self, f'use_{name}'):
+                    self.ocr_apis.append(name)
 
     @property
     def command_start_pattern(self) -> str:

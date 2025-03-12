@@ -145,7 +145,7 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
     if target_language == 'auto':
         if source_language == 'auto' or source_language.language != 'zh':
             target_language = Language.make('zh')
-            notice_msg += '\n图片翻译无法自动选择目标语言，默认翻译为中文。'
+            notice_msg += '\n图片翻译无法自动选择目标语言，默认翻译为中文'
         else:
             target_language = Language.make('en')
             notice_msg += '\n未指定目标语言，默认翻译为英文'
@@ -166,6 +166,7 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
             )
 
 
+# TODO 添加指定目标语言
 @ocr_handler.handle()
 async def ocr(bot: Bot, event: Event, matcher: Matcher) -> None:  # noqa: C901
     if not config.use_tencent:
@@ -205,9 +206,10 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher) -> None:  # noqa: C901
     await ocr_handler.send('识别中...')
     for image in ocr_images:
         nodes = []
-        msgs = await handle_ocr(image)
-        for msg in msgs:
-            add_node(nodes, msg, bot.self_id)
-        await ocr_handler.send(
-            await UniMessage(Reference(nodes=nodes)).export(),
-        )
+        results = await handle_ocr(image)
+        for msgs in results:
+            for msg in msgs:
+                add_node(nodes, msg, bot.self_id)
+            await ocr_handler.send(
+                await UniMessage(Reference(nodes=nodes)).export(),
+            )
