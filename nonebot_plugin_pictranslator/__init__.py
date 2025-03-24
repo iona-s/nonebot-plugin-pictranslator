@@ -80,8 +80,6 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
     if source_language is None or target_language is None:
         await translate_handler.finish('语言输入有误或不支持')
 
-    await translate_handler.finish(f'{source_language}, {target_language}')
-
     image_search = bool(match_group[0])
     images = await extract_images(msg)
     translate_content = images if images else match_group[3].strip()
