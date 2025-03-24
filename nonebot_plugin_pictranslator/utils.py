@@ -13,7 +13,13 @@ from nonebot_plugin_alconna.uniseg import (
     UniMsg,
 )
 
-__all__ = ['add_node', 'extract_from_reply', 'extract_images']
+__all__ = [
+    'add_node',
+    'extract_from_reply',
+    'extract_images',
+    'get_language',
+    'unescape_text',
+]
 
 from .define import LANGUAGE_TYPE
 
@@ -42,6 +48,15 @@ def get_language(
         logger.error(f'无法识别的语言: {lang}')
         return None
     return result_lang
+
+
+def unescape_text(text: str) -> str:
+    return (
+        text.replace('&amp;', '&')
+        .replace('&#91;', '[')
+        .replace('&#93;', ']')
+        .replace('&#44;', ',')
+    )
 
 
 async def extract_from_reply(

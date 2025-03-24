@@ -41,21 +41,31 @@ class LanguageDetectionResponse(BaseResponseModel):
     data: LanguageDetectionData = Field(..., description='语言检测结果数据')
 
 
-class LanguageTranslationData(BaseResponseModel):
+class TextTranslationResult(BaseResponseModel):
     source_text: str = Field(..., alias='src', description='源文本')
     target_text: str = Field(..., alias='dst', description='目标文本')
 
 
-class LanguageTranslationResponse(FixBaiduLangCodeModel):
+class TextTranslationResponse(FixBaiduLangCodeModel):
     error_code: Optional[str] = Field(default=None, description='错误码')
     error_msg: Optional[str] = Field(default=None, description='错误信息')
     source: str = Field(..., alias='from', description='源语言')
     target: str = Field(..., alias='to', description='目标语言')
-    data: list[LanguageTranslationData] = Field(
-        ...,
-        alias='trans_result',
-        description='翻译结果数据',
+    trans_result: list[TextTranslationResult] = Field(
+        ..., description='翻译结果'
     )
+
+    @property
+    def translation_result(self) -> TextTranslationResult:
+        full_source_text = '\n'.join(
+            [result.source_text for result in self.trans_result]
+        )
+        full_target_text = '\n'.join(
+            [result.target_text for result in self.trans_result]
+        )
+        return TextTranslationResult(
+            src=full_source_text, dst=full_target_text
+        )
 
 
 class ImageTranslationSection(BaseResponseModel):

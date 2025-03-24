@@ -29,7 +29,13 @@ from .translate import (
     handle_ocr,
     handle_text_translate,
 )
-from .utils import add_node, extract_from_reply, extract_images, get_language
+from .utils import (
+    add_node,
+    extract_from_reply,
+    extract_images,
+    get_language,
+    unescape_text,
+)
 
 __plugin_meta__ = PluginMetadata(
     name='nonebot-plugin-pictranslator',
@@ -48,7 +54,7 @@ command_start_pattern = config.command_start_pattern
 dictionary_handler = on_regex(rf'^{command_start_pattern}(?:词典|查词)(.+)')
 translate_re_pattern = (
     rf'^{command_start_pattern}'
-    r'(图片)?([\S]+)?译([\S]+)? ?(.*)'
+    r'(图片)?([\S]+)?译([\S]+)? ?([.\s\S]*)'
 )
 translate_handler = on_regex(translate_re_pattern)
 ocr_handler = on_regex(rf'^{command_start_pattern}ocr', flags=IGNORECASE)
@@ -114,8 +120,9 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
 
     # 进行文本翻译
     if isinstance(translate_content, str):
+        await translate_handler.send('翻译中...')
         results = await handle_text_translate(
-            translate_content,
+            unescape_text(translate_content),
             source_language,
             target_language,
         )

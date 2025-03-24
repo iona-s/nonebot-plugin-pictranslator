@@ -82,7 +82,7 @@ class BaiduCloudApi(TranslateApi):
             return '百度智能云翻译出错'
         content = result.translation_result
         return (
-            f'百度翻译:\n{Language.get(result.source).display_name("zh")}->'
+            f'百度智能云翻译:\n{Language.get(result.source).display_name("zh")}->'
             f'{Language.get(result.target).display_name("zh")}\n'
             f'{content.target_text}'
         )

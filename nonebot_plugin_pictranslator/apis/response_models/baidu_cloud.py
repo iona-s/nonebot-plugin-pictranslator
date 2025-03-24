@@ -18,7 +18,15 @@ class TextTranslationContent(FixBaiduLangCodeModel):
 
     @property
     def translation_result(self) -> TextTranslationResult:
-        return self.trans_result[0]
+        full_source_text = '\n'.join(
+            [result.source_text for result in self.trans_result]
+        )
+        full_target_text = '\n'.join(
+            [result.target_text for result in self.trans_result]
+        )
+        return TextTranslationResult(
+            src=full_source_text, dst=full_target_text
+        )
 
 
 class TextTranslationResponse(BaseResponseModel):

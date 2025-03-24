@@ -13,7 +13,7 @@ from .response_models.baidu import (
     ImageTranslationData,
     ImageTranslationResponse,
     LanguageDetectionResponse,
-    LanguageTranslationResponse,
+    TextTranslationResponse,
 )
 
 
@@ -68,7 +68,7 @@ class BaiduApi(TranslateApi):
         text: str,
         source_language: str,
         target_language: str,
-    ) -> Optional[LanguageTranslationResponse]:
+    ) -> Optional[TextTranslationResponse]:
         payload = {
             'q': text,
             'from': source_language,
@@ -78,7 +78,7 @@ class BaiduApi(TranslateApi):
         return await self._handle_request(
             url='https://fanyi-api.baidu.com/api/trans/vip/translate',
             method='POST',
-            response_model=LanguageTranslationResponse,
+            response_model=TextTranslationResponse,
             data=payload,
         )
 
@@ -95,11 +95,10 @@ class BaiduApi(TranslateApi):
         )
         if result is None:
             return '百度翻译出错'
-        data = result.data[0]
         return (
             f'百度翻译:\n{Language.get(result.source).display_name("zh")}->'
             f'{Language.get(result.target).display_name("zh")}\n'
-            f'{data.target_text}'
+            f'{result.translation_result.target_text}'
         )
 
     async def _image_translate(
