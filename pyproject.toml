@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-pictranslator"
-version = "1.0.6"
+version = "1.0.7"
 authors = [
     { name = "iona-s" },
 ]
