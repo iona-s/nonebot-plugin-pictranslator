@@ -10,6 +10,7 @@ from ..config import config
 from ..define import BAIDU_LANG_CODE_MAP, LANGUAGE_TYPE
 from .base_api import TranslateApi
 from .response_models.baidu import (
+    ImageTranslationData,
     ImageTranslationResponse,
     LanguageDetectionResponse,
     LanguageTranslationResponse,
@@ -106,7 +107,7 @@ class BaiduApi(TranslateApi):
         base64_image: bytes,
         source_language: str,
         target_language: str,
-    ) -> Optional[ImageTranslationResponse]:
+    ) -> Optional[ImageTranslationData]:
         payload = {
             'from': source_language,
             'to': target_language,
@@ -119,13 +120,14 @@ class BaiduApi(TranslateApi):
         image_md5 = md5(image_io.read()).hexdigest()  # noqa S324
         payload = self.sign(payload, image_md5, sign_image=True)
         image = {'image': ('image.png', image_io, 'multipart/form-data')}
-        return await self._handle_request(
+        result = await self._handle_request(
             url='https://fanyi-api.baidu.com/api/trans/sdk/picture',
             method='POST',
             response_model=ImageTranslationResponse,
             data=payload,
             files=image,
         )
+        return None if result is None else result.content
 
     async def image_translate(
         self,
@@ -140,21 +142,20 @@ class BaiduApi(TranslateApi):
         )
         if result is None:
             return ['百度翻译出错']
-        data = result.data
-        if data.source == 'auto':
+        if result.source == 'auto':
             source_name = '自动检测'
         else:
-            source_name = Language.get(data.source).display_name('zh')
+            source_name = Language.get(result.source).display_name('zh')
         msgs = [
             f'百度翻译:\n{source_name}->'
-            f'{Language.get(data.target).display_name("zh")}\n',
-            b64decode(data.render_image),
+            f'{Language.get(result.target).display_name("zh")}\n',
+            b64decode(result.render_image),
             '分段翻译:',
         ]
         msgs.extend(
             [
                 f'{section.source_text}\n->{section.target_text}'
-                for section in data.content
+                for section in result.sections
             ],
         )
         return msgs

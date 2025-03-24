@@ -53,7 +53,7 @@ class YoudaoApi(TranslateApi):
         return payload
 
     async def language_detection(self, text: str) -> Optional[str]:
-        error_msg = '有道翻译API不支持语言检测'
+        error_msg = '有道翻译API不提供语言检测'
         raise NotImplementedError(error_msg)
 
     async def _text_translate(

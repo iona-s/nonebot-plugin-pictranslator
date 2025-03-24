@@ -49,7 +49,7 @@ async def handle_text_translate(
                 )
                 if not detection_api:
                     results.append(
-                        '有道不提供语言检测API，故默认翻译为中文。'
+                        '有道/百度智能云不提供语言检测API，故默认翻译为中文。'
                         '可使用[译<语言>]来指定',
                     )
                     target_language = Language.make('zh')

@@ -5,14 +5,14 @@ from pydantic import VERSION
 
 PYDANTIC_V2 = int(VERSION.split('.', 1)[0]) == 2  # noqa: PLR2004
 
-# TODO baidu_cloud WIP
 ALL_APIS = ('baidu', 'tencent', 'youdao', 'baidu_cloud')
 ALL_API = Literal['baidu', 'tencent', 'youdao', 'baidu_cloud']
-SUPPORTED_TEXT_TRANSLATE_APIS = ('tencent', 'baidu', 'youdao')
-SUPPORTED_TEXT_TRANSLATE_API = Literal['tencent', 'youdao', 'baidu']
 
-SUPPORTED_IMAGE_TRANSLATE_APIS = ('baidu', 'youdao', 'tencent')
-SUPPORTED_IMAGE_TRANSLATE_API = Literal['tencent', 'youdao', 'baidu']
+SUPPORTED_TEXT_TRANSLATE_APIS = ('tencent', 'baidu', 'youdao', 'baidu_cloud')
+SUPPORTED_TEXT_TRANSLATE_API = ALL_API
+
+SUPPORTED_IMAGE_TRANSLATE_APIS = ('baidu', 'youdao', 'baidu_cloud', 'tencent')
+SUPPORTED_IMAGE_TRANSLATE_API = ALL_API
 
 SUPPORTED_OCR_APIS = ('baidu_cloud', 'tencent')
 SUPPORTED_OCR_API = Literal['tencent', 'baidu_cloud']

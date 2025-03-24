@@ -25,6 +25,8 @@ def get_apis(
     language_detection: bool = False,
 ) -> list[type[TA]]:
     apis = [ALL_APIS.get(name) for name in getattr(config, f'{api_type}_apis')]
-    if language_detection and YoudaoApi in apis:
-        apis.remove(YoudaoApi)
+    if language_detection:
+        for api in (BaiduCloudApi, YoudaoApi):
+            if api in apis:
+                apis.remove(api)
     return apis

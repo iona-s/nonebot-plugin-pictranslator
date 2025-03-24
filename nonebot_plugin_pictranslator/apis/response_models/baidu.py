@@ -78,7 +78,7 @@ class ImageTranslationData(FixBaiduLangCodeModel):
         alias='pasteImg',
         description='翻译结果图片base64串',
     )
-    content: list[ImageTranslationSection] = Field(
+    sections: list[ImageTranslationSection] = Field(
         ...,
         description='详细分段识别内容',
     )
@@ -87,4 +87,4 @@ class ImageTranslationData(FixBaiduLangCodeModel):
 class ImageTranslationResponse(BaseResponseModel):
     error_code: str = Field(..., description='错误码')
     error_msg: str = Field(..., description='错误信息')
-    data: ImageTranslationData = Field(..., description='翻译结果数据')
+    content: ImageTranslationData = Field(..., description='翻译结果数据')
