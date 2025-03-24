@@ -29,7 +29,7 @@ from .translate import (
     handle_ocr,
     handle_text_translate,
 )
-from .utils import add_node, extract_from_reply, extract_images, get_languages
+from .utils import add_node, extract_from_reply, extract_images, get_language
 
 __plugin_meta__ = PluginMetadata(
     name='nonebot-plugin-pictranslator',
@@ -48,7 +48,7 @@ command_start_pattern = config.command_start_pattern
 dictionary_handler = on_regex(rf'^{command_start_pattern}(?:词典|查词)(.+)')
 translate_re_pattern = (
     rf'^{command_start_pattern}'
-    r'(图片)?(?:翻译|(.+)译([\S]+)) ?(.*)'
+    r'(图片)?([\S]+)?译([\S]+)? ?(.*)'
 )
 translate_handler = on_regex(translate_re_pattern)
 ocr_handler = on_regex(rf'^{command_start_pattern}ocr', flags=IGNORECASE)
@@ -72,22 +72,16 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
     matcher: Matcher,
     match_group: tuple[Any, ...] = RegexGroup(),
 ) -> None:
-    source_language, target_language = get_languages(
-        match_group[1],
-        match_group[2],
-    )
     msg = await UniMessage.generate(event=event)
-    if target_language is None:
-        # 避免因为图片导致误判
-        plain_text = msg.extract_plain_text()
-        new_match = match(translate_re_pattern, plain_text)
-        if new_match:
-            source_language, target_language = get_languages(
-                new_match.group(2),
-                new_match.group(3),
-            )
-        if not new_match or not target_language:
-            await translate_handler.finish('语言输入有误或不支持')
+    plain_text = msg.extract_plain_text()
+    new_match = match(translate_re_pattern, plain_text)
+    source_language = get_language(new_match.group(2), auto_flags={None, '翻'})
+    target_language = get_language(new_match.group(3))
+    if source_language is None or target_language is None:
+        await translate_handler.finish('语言输入有误或不支持')
+
+    await translate_handler.finish(f'{source_language}, {target_language}')
+
     image_search = bool(match_group[0])
     images = await extract_images(msg)
     translate_content = images if images else match_group[3].strip()
@@ -119,6 +113,8 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
             if image_search:
                 await translate_handler.finish('未检测到图片')
             translate_content = waited_msg.extract_plain_text()
+
+    # 进行文本翻译
     if isinstance(translate_content, str):
         results = await handle_text_translate(
             translate_content,
@@ -130,6 +126,8 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
                 await UniMessage(Text(result)).export(),
             )
         return
+
+    # 进行图片翻译
     base64_images = []
     for image in translate_content:
         if image.path:

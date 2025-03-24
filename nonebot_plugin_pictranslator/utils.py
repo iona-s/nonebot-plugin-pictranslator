@@ -13,16 +13,20 @@ from nonebot_plugin_alconna.uniseg import (
     UniMsg,
 )
 
-from .define import LANGUAGE_TYPE
+__all__ = ['add_node', 'extract_from_reply', 'extract_images']
 
-__all__ = ['add_node', 'extract_from_reply', 'extract_images', 'get_languages']
+from .define import LANGUAGE_TYPE
 
 
 def get_language(
-    lang: Optional[str],
-) -> Optional[Language]:
-    threshold = 10
-    if lang is None or len(lang) > threshold:
+    lang: Optional[str], *, auto_flags: Optional[set[Optional[str]]] = None
+) -> Optional[LANGUAGE_TYPE]:
+    if auto_flags is None:
+        auto_flags = {None}
+    if lang in auto_flags:
+        return 'auto'
+    threshold = 5
+    if len(lang) > threshold:
         return None
     lang_str = lang + '文' if not lang.endswith(('语', '文')) else lang
     try:
@@ -38,21 +42,6 @@ def get_language(
         logger.error(f'无法识别的语言: {lang}')
         return None
     return result_lang
-
-
-def get_languages(
-    source: Optional[str],
-    target: Optional[str],
-) -> Union[tuple[None, None], tuple[LANGUAGE_TYPE, LANGUAGE_TYPE]]:
-    if source and target:
-        source_language = get_language(source)
-        target_language = get_language(target)
-        if not source_language or not target_language:
-            return None, None
-    else:
-        source_language = 'auto'
-        target_language = 'auto'
-    return source_language, target_language
 
 
 async def extract_from_reply(
