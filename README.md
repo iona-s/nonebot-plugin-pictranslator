@@ -152,9 +152,9 @@ _✨ NoneBot 翻译插件 ✨_
 |         BAIDU_KEY          | 若使用则必填 |               无                |               String                |                          百度翻译开放平台的密钥                           |
 |         USE_BAIDU          |   否    |               /                |                Bool                 |                    是否启用百度翻译API，填写了上两项则默认启用                     |
 |          百度API相关           |   /    |               /                |                  /                  |  详见[百度智能云文档](https://ai.baidu.com/ai-doc/REFERENCE/Tktjypljq)  |
-|    BAIDU_SMART_CLOUD_ID    | 若使用则必填 |               无                |               String                |                        百度智能云的应用API KEY                         |
-|   BAIDU_SMART_CLOUD_KEY    | 若使用则必填 |               无                |               String                |                       百度智能云的应用Secret KEY                       |
-|   USE_BAIDU_SMART_CLOUD    |   否    |               /                |                Bool                 |                    是否启用百度智能云API，填写了上两项则默认启用                    |
+|       BAIDU_CLOUD_ID       | 若使用则必填 |               无                |               String                |                        百度智能云的应用API KEY                         |
+|      BAIDU_CLOUD_KEY       | 若使用则必填 |               无                |               String                |                       百度智能云的应用Secret KEY                       |
+|      USE_BAIDU_CLOUD       |   否    |               /                |                Bool                 |                    是否启用百度智能云API，填写了上两项则默认启用                    |
 |        TIANAPI_KEY         | 若使用则必填 |               无                |               String                |                      天聚数行APIkey，用于中英词典查询                       |
 
 
