@@ -100,16 +100,19 @@ class Config(BaseModel):
         description='是否启用百度开放翻译平台API，填写了上两项则默认启用',
     )
 
-    baidu_cloud_id: Optional[str] = Field(
+    baidu_smart_cloud_id: Optional[str] = Field(
+        alias='baidu_cloud_id',
         default=None,
         description='百度智能云API的应用APIKEY',
         coerce_numbers_to_str=True,
     )
-    baidu_cloud_key: Optional[str] = Field(
+    baidu_smart_cloud_key: Optional[str] = Field(
+        alias='baidu_cloud_key',
         default=None,
         description='百度智能云API的应用Secret KEY',
     )
-    use_baidu_cloud: Optional[bool] = Field(
+    use_baidu_smart_cloud: Optional[bool] = Field(
+        alias='use_baidu_cloud',
         default=None,
         description='是否启用百度智能云API，填写了上两项则默认启用',
     )
