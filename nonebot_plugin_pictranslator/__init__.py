@@ -193,7 +193,7 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher) -> None:  # noqa: C901
         await ocr_handler.finish('未检测到图片')
     ocr_images: list[Union[str, bytes]] = []
     for image in images:
-        if image.url:
+        if image.url and config.ocr_use_image_url:
             ocr_images.append(image.url)
             continue
         if image.path:
