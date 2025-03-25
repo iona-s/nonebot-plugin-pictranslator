@@ -304,8 +304,11 @@ class TencentApi(TranslateApi):
                 - 1
             )
             font = ImageFont.truetype(_font, actual_font_size)
-            r, g, b = average_color
-            luminance = 0.299 * r + 0.587 * g + 0.114 * b
+            luminance = (
+                0.299 * average_color[0]
+                + 0.587 * average_color[1]
+                + 0.114 * average_color[2]
+            )
             bg_draw.multiline_text(
                 (0, 0),
                 image_record.target_text,
