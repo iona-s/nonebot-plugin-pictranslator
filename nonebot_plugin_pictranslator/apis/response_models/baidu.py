@@ -31,17 +31,19 @@ else:
             return values
 
 
-class LanguageDetectionData(FixBaiduLangCodeModel):
+class LanguageDetectionContent(FixBaiduLangCodeModel):
     lang: str = Field(..., alias='src', description='语言代码')
 
 
 class LanguageDetectionResponse(BaseResponseModel):
     error_code: str = Field(..., description='错误码')
     error_msg: str = Field(..., description='错误信息')
-    data: LanguageDetectionData = Field(..., description='语言检测结果数据')
+    content: LanguageDetectionContent = Field(
+        ..., alias='data', description='语言检测结果数据'
+    )
 
 
-class TextTranslationResult(BaseResponseModel):
+class TextTranslationContent(BaseResponseModel):
     source_text: str = Field(..., alias='src', description='源文本')
     target_text: str = Field(..., alias='dst', description='目标文本')
 
@@ -51,19 +53,19 @@ class TextTranslationResponse(FixBaiduLangCodeModel):
     error_msg: Optional[str] = Field(default=None, description='错误信息')
     source: str = Field(..., alias='from', description='源语言')
     target: str = Field(..., alias='to', description='目标语言')
-    trans_result: list[TextTranslationResult] = Field(
+    trans_result: list[TextTranslationContent] = Field(
         ..., description='翻译结果'
     )
 
     @property
-    def translation_result(self) -> TextTranslationResult:
+    def translation_result(self) -> TextTranslationContent:
         full_source_text = '\n'.join(
             [result.source_text for result in self.trans_result]
         )
         full_target_text = '\n'.join(
             [result.target_text for result in self.trans_result]
         )
-        return TextTranslationResult(
+        return TextTranslationContent(
             src=full_source_text, dst=full_target_text
         )
 
@@ -74,7 +76,7 @@ class ImageTranslationSection(BaseResponseModel):
     # 其余参数用不上
 
 
-class ImageTranslationData(FixBaiduLangCodeModel):
+class ImageTranslationContent(FixBaiduLangCodeModel):
     source: str = Field(..., alias='from', description='源语言')
     target: str = Field(..., alias='to', description='目标语言')
     source_text: str = Field(
@@ -90,6 +92,7 @@ class ImageTranslationData(FixBaiduLangCodeModel):
     )
     sections: list[ImageTranslationSection] = Field(
         ...,
+        alias='content',
         description='详细分段识别内容',
     )
 
@@ -97,4 +100,6 @@ class ImageTranslationData(FixBaiduLangCodeModel):
 class ImageTranslationResponse(BaseResponseModel):
     error_code: str = Field(..., description='错误码')
     error_msg: str = Field(..., description='错误信息')
-    content: ImageTranslationData = Field(..., description='翻译结果数据')
+    content: ImageTranslationContent = Field(
+        ..., alias='data', description='翻译结果数据'
+    )

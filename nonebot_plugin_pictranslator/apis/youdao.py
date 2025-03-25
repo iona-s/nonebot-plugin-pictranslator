@@ -130,7 +130,6 @@ class YoudaoApi(TranslateApi):
         )
         if result is None:
             return ['有道翻译出错']
-        msgs = []
         source_language = Language.get(result.source)
         target_language = Language.get(result.target)
         msgs = [
@@ -143,7 +142,7 @@ class YoudaoApi(TranslateApi):
         msgs.extend(
             [
                 f'{section.source_text}\n->{section.target_text}'
-                for section in result.regions
+                for section in result.sections
             ],
         )
         return msgs

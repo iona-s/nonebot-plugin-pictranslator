@@ -10,7 +10,7 @@ from ..config import config
 from ..define import BAIDU_LANG_CODE_MAP, LANGUAGE_TYPE
 from .base_api import TranslateApi
 from .response_models.baidu import (
-    ImageTranslationData,
+    ImageTranslationContent,
     ImageTranslationResponse,
     LanguageDetectionResponse,
     TextTranslationResponse,
@@ -61,7 +61,7 @@ class BaiduApi(TranslateApi):
         result = await self._language_detection(text)
         if result is None:
             return None
-        return Language.get(result.data.lang)
+        return Language.get(result.content.lang)
 
     async def _text_translate(
         self,
@@ -106,7 +106,7 @@ class BaiduApi(TranslateApi):
         base64_image: bytes,
         source_language: str,
         target_language: str,
-    ) -> Optional[ImageTranslationData]:
+    ) -> Optional[ImageTranslationContent]:
         payload = {
             'from': source_language,
             'to': target_language,

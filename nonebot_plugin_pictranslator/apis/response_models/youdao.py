@@ -32,7 +32,7 @@ class TextTranslationResponse(BaseResponseModel):
         return self.translation[0]
 
 
-class RegionContent(BaseResponseModel):
+class ImageTranslationSection(BaseResponseModel):
     source_text: str = Field(..., alias='context', description='原文')
     target_text: str = Field(..., alias='tranContent', description='翻译')
     # 还有很多用不上的用于渲染图片的参数
@@ -53,7 +53,7 @@ class ImageTranslationResponse(BaseResponseModel):
         alias='render_image',
         description='渲染后的图片base64',
     )
-    regions: list[RegionContent] = Field(
+    sections: list[ImageTranslationSection] = Field(
         ...,
         alias='resRegions',
         description='分区域识别详细结果',

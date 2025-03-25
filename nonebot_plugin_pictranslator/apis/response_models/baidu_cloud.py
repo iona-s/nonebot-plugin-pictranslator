@@ -35,7 +35,7 @@ class TextTranslationResponse(BaseResponseModel):
     )
 
 
-class SectionContent(BaseResponseModel):
+class ImageTranslationSection(BaseResponseModel):
     source_text: str = Field(..., alias='src', description='源文本')
     target_text: str = Field(..., alias='dst', description='目标文本')
 
@@ -45,7 +45,7 @@ class ImageTranslationContent(FixBaiduLangCodeModel):
     target: str = Field(..., alias='to', description='目标语言')
     source_text: str = Field(..., alias='sumSrc', description='未分段翻译原文')
     target_text: str = Field(..., alias='sumDst', description='未分段翻译结果')
-    sections: list[SectionContent] = Field(
+    sections: list[ImageTranslationSection] = Field(
         ..., alias='content', description='详细分段识别内容'
     )
     render_image: str = Field(
