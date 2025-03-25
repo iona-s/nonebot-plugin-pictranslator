@@ -21,6 +21,10 @@ class Config(BaseModel):
         default=None,
         description='配置命令的起始字符',
     )
+    pictranslate_use_image_url: bool = Field(
+        default=False,
+        description='是否允许在调用api时使用图片url',
+    )
 
     text_translate_apis: list[SUPPORTED_TEXT_TRANSLATE_API] = Field(
         default=None,

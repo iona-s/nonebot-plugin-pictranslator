@@ -130,6 +130,7 @@ _✨ NoneBot 翻译插件 ✨_
 |            配置项             |   必填   |              默认值               |                 可填值                 |                               说明                               |
 |:--------------------------:|:------:|:------------------------------:|:-----------------------------------:|:--------------------------------------------------------------:|
 | PICTRANSLATE_COMMAND_START |   否    |  同`nonebot`自身的`COMMAND_START`  |             Array[str]              |           配置命令的起始字符，默认使用`nonebot`自身的`COMMAND_START`            |
+| PICTRANSLATE_USE_IMAGE_URL |   否    |             false              |                bool                 |              是否允许在调用api时传递图片url而不是图片本身，可能会有一些未知问题              |
 |    TEXT_TRANSLATE_APIS     |   否    | ['tencent', 'baidu', 'youdao'] | Array['tencent', 'baidu', 'youdao'] |                    启用哪些API，并以什么优先级调用进行文本翻译                     |
 |    IMAGE_TRANSLATE_APIS    |   否    |               同上               |                 同上                  |                          图片翻译API选择，同上                          |
 |    IMAGE_TRANSLATE_APIS    |   否    |   ['baidu_cloud', 'tencent']   |   Array['baidu_cloud', 'tencent']   |                          ocrAPI选择，同上                           |

@@ -193,12 +193,9 @@ async def ocr(bot: Bot, event: Event, matcher: Matcher) -> None:  # noqa: C901
         await ocr_handler.finish('未检测到图片')
     ocr_images: list[Union[str, bytes]] = []
     for image in images:
-        # 出问题再说吧
-        # if (
-        #     'multimedia.nt.qq.com.cn' in image.url
-        # ):  # 暂时只有ntqq的图片直接用url
-        #     ocr_images.append(image.url)
-        #     continue
+        if image.url:
+            ocr_images.append(image.url)
+            continue
         if image.path:
             ocr_images.append(Path(image.path).read_bytes())
             continue
