@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import Field
 from typing_extensions import Self
@@ -36,7 +36,7 @@ class LanguageDetectionContent(FixBaiduLangCodeModel):
 
 
 class LanguageDetectionResponse(BaseResponseModel):
-    error_code: str = Field(..., description='错误码')
+    error_code: Union[str, int] = Field(..., description='错误码')
     error_msg: str = Field(..., description='错误信息')
     content: LanguageDetectionContent = Field(
         ..., alias='data', description='语言检测结果数据'
