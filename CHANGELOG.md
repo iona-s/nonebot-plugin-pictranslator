@@ -1,11 +1,19 @@
 # 更新记录
+
+## v1.0.10
+### 新增功能
+1. 添加配置项`TENCENT_TRANSLATE_FONT`，可设置腾讯图片翻译画图使用的字体
+
+### 问题修复
+1. 修复因字体文件缺失导致腾讯图片翻译报错，并优化~~其实是一直写的都有问题~~画图效果
+
 ## v1.0.9
 ### 问题修复
 1. 修复百度翻译百度翻译开放平台语种识别报错
 
 ## v1.0.8
 ### 新增功能
-1. ocr相关api运行直接传递图片url，需在配置项中设置`ocr_use_image_url`为`true`
+1. ocr相关api运行直接传递图片url，需在配置项中设置`OCR_USE_IMAGE_URL`为`true`
 ### 问题修复
 1. 修复百度和腾讯图片翻译报错
 
@@ -33,10 +41,10 @@
 
 ## v1.0.5
 ### 问题修复
-1. `ocr`指令未正常使用插件配置项中的`pictranlate_command_start`
+1. `ocr`指令未正常使用插件配置项中的`PICTRANLATE_COMMAND_START`
 2. 腾讯ocrapi返回的日语语言代码不符合ISO 639标准，导致无法正确给出语言名称
 
 ## v1.0.4
 ### 新增功能
-1. 增加`pictranlate_command_start`配置项\
+1. 增加`PICTRANLATE_COMMAND_START`配置项\
 用于配置命令的起始字符，默认使用`nonebot`的`COMMAND_START`配置项
