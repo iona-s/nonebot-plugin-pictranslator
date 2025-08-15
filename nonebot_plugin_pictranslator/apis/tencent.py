@@ -284,13 +284,22 @@ class TencentApi(TranslateApi):
                 average_color,
             )
             bg_draw = ImageDraw.Draw(bg)
-            _font = (
-                'msyh.ttc' if target_language.language == 'zh' else 'arial.ttf'
-            )
+            try:
+                font = ImageFont.truetype(
+                    (
+                        'msyh.ttc'
+                        if target_language.language == 'zh'
+                        else 'arial.ttf'
+                    ),
+                    100,
+                )
+            except OSError:
+                msgs.append('字体加载出错')
+                break
             _, _, text_width, text_height = bg_draw.textbbox(
                 (0, 0),
                 image_record.target_text,
-                font=ImageFont.truetype(_font, 100),
+                font=font,
             )
             horizontal_ratio = image_record.width / text_width
             vertical_ratio = image_record.height / text_height
@@ -303,7 +312,7 @@ class TencentApi(TranslateApi):
                 )
                 - 1
             )
-            font = ImageFont.truetype(_font, actual_font_size)
+            font = ImageFont.truetype(font.path, actual_font_size)
             luminance = (
                 0.299 * average_color[0]
                 + 0.587 * average_color[1]
