@@ -4,7 +4,8 @@ from hashlib import sha256
 from hmac import new as hmac_new
 from io import BytesIO
 from json import dumps
-from math import floor
+from math import ceil, floor
+from textwrap import fill
 from time import time
 from typing import Literal, Optional, Union
 from uuid import uuid4
@@ -273,26 +274,31 @@ class TencentApi(TranslateApi):
                 f'{image_record.source_text}\n->{image_record.target_text}\n',
             )
             whole_source_text += image_record.source_text
-            cropped_img = img.crop(
-                (
-                    image_record.x,
-                    image_record.y,
-                    image_record.x + image_record.width,
-                    image_record.y + image_record.height,
-                ),
+            average_color = (
+                img.crop(
+                    (
+                        image_record.x,
+                        image_record.y,
+                        image_record.x + image_record.width,
+                        image_record.y + image_record.height,
+                    ),
+                )
+                .resize((1, 1))
+                .getpixel((0, 0))
             )
-            average_color = cropped_img.resize((1, 1)).getpixel((0, 0))
             bg = Image.new(
                 'RGB',
                 (image_record.width, image_record.height),
                 average_color,
             )
             bg_draw = ImageDraw.Draw(bg)
+
             try:
                 font = ImageFont.truetype(font_name, 100)
             except OSError:
                 msgs.append('字体加载出错')
                 break
+
             _, _, text_width, text_height = bg_draw.textbbox(
                 (0, 0),
                 image_record.target_text,
@@ -302,14 +308,33 @@ class TencentApi(TranslateApi):
             vertical_ratio = image_record.height / text_height
             line_number = floor(vertical_ratio / horizontal_ratio)
             line_number = line_number if line_number > 0 else 1
-            actual_font_size = (
-                min(
-                    floor(100 * horizontal_ratio * line_number),
-                    floor(100 * vertical_ratio / line_number),
+
+            if line_number > 1:
+                # 腾讯api不返回带换行符的文本，可以插入换行来追求合适的文本大小
+                image_record.target_text = fill(
+                    image_record.target_text,
+                    ceil(len(image_record.target_text) / line_number),
                 )
-                - 1
+            actual_font_size = min(
+                floor(100 * horizontal_ratio * line_number),
+                floor(100 * vertical_ratio / line_number),
             )
+
             font = ImageFont.truetype(font_name, actual_font_size)
+            _, _, text_w, text_h = bg_draw.multiline_textbbox(
+                (0, 0),
+                image_record.target_text,
+                font=font,
+            )
+            while text_w > image_record.width or text_h > image_record.height:
+                actual_font_size -= 2
+                font = ImageFont.truetype(font_name, actual_font_size)
+                _, _, text_w, text_h = bg_draw.multiline_textbbox(
+                    (0, 0),
+                    image_record.target_text,
+                    font=font,
+                )
+
             luminance = (
                 0.299 * average_color[0]
                 + 0.587 * average_color[1]
