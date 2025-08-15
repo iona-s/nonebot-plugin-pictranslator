@@ -264,6 +264,10 @@ class TencentApi(TranslateApi):
         # 腾讯是分行识别的，故增加一个整段文本
         whole_source_text = ''
         img = Image.open(BytesIO(b64decode(base64_image)))
+        font_name = config.tencent_translate_font.get(
+            target_language.language,
+            config.tencent_translate_font.get('default', 'arial.ttf'),
+        )
         for image_record in result.image_records:
             seg_translation_msgs.append(
                 f'{image_record.source_text}\n->{image_record.target_text}\n',
@@ -285,14 +289,7 @@ class TencentApi(TranslateApi):
             )
             bg_draw = ImageDraw.Draw(bg)
             try:
-                font = ImageFont.truetype(
-                    (
-                        'msyh.ttc'
-                        if target_language.language == 'zh'
-                        else 'arial.ttf'
-                    ),
-                    100,
-                )
+                font = ImageFont.truetype(font_name, 100)
             except OSError:
                 msgs.append('字体加载出错')
                 break
@@ -312,7 +309,7 @@ class TencentApi(TranslateApi):
                 )
                 - 1
             )
-            font = ImageFont.truetype(font.path, actual_font_size)
+            font = ImageFont.truetype(font_name, actual_font_size)
             luminance = (
                 0.299 * average_color[0]
                 + 0.587 * average_color[1]

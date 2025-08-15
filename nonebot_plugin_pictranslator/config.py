@@ -71,6 +71,10 @@ class Config(BaseModel):
         default='ap-shanghai',
         description='腾讯翻译API的region参数',
     )
+    tencent_translate_font: Optional[dict[str, str]] = Field(
+        default=None,
+        description='腾讯图片翻译所使用的字体',
+    )
 
     youdao_id: Optional[str] = Field(
         default=None,
@@ -151,6 +155,12 @@ class Config(BaseModel):
             for name in SUPPORTED_OCR_APIS:
                 if getattr(self, f'use_{name}'):
                     self.ocr_apis.append(name)
+
+        if self.use_tencent and self.tencent_translate_font is None:
+            self.tencent_translate_font = {
+                'default': 'arial.ttf',
+                'zh': 'msyh.ttc',
+            }
 
     @property
     def command_start_pattern(self) -> str:
