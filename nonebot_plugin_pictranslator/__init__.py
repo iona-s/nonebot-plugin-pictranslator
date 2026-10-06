@@ -88,7 +88,7 @@ async def translate(  # noqa: C901 PLR0912 PLR0915
 
     image_search = bool(match_group[0])
     images = await extract_images(msg)
-    translate_content = images if images else match_group[3].strip()
+    translate_content = images or match_group[3].strip()
     if Reply in msg:
         images = await extract_from_reply(msg, Image)
         if images:
